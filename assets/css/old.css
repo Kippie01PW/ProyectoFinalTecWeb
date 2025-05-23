@@ -1,0 +1,404 @@
+    /* Reset universal y fuente base de old.css */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+  }
+
+  body {
+      font-family: "Poppins", sans-serif; /* */
+      background-color: #f4f4f4;
+      color: #333;
+      padding-top: 91px; /* Ajuste para el header fijo, altura header (50px logo + 20px*2 padding + 1px border) */
+  }
+
+  .container { /* */
+      width: 90%;
+      max-width: 1200px;
+      margin: 0 auto;
+      overflow: hidden; 
+  }
+  
+  /* Header styles from old.css and combined */
+  header {
+      position: fixed; /* */
+      top: 0; /* */
+      width: 100%; /* */
+      z-index: 1000; /* */
+      border-bottom: 1px solid #f3f2f4; /* */
+      padding: 20px 50px; /* */
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #6495ED; /* */
+  }
+
+  .logo img { /* */
+      width: 154px; 
+      height: auto;
+      display: block;
+      object-fit: contain; 
+  }
+
+  header .navigation-header { /* */
+      display: flex;
+      gap: 40px;
+  }
+
+  header .navigation-header a { /* */
+      text-decoration: none;
+      color: black;
+      font-weight: 500;
+  }
+
+  header .navigation-header a:hover { /* */
+      text-decoration: underline;
+  }
+
+  /* Responsive Menu Button from old.css */
+  .btn-menu-responsive {
+      background: none;
+      border: none;
+      outline: none;
+      font-size: 22px; /* */
+      cursor: pointer;
+      display: none; /* Oculto por defecto, se mostrará en móvil */
+  }
+  
+  /* Mobile Menu from old.css (adapted) */
+  .menu-mobile { /* */
+      display: flex;
+      gap: 70px; /* */
+      flex-direction: column; /* */
+      align-items: center; /* */
+      justify-content: center; /* */
+      position: fixed; /* */
+      top: 0; /* */
+      left: 0; /* */
+      background-color: #fff; /* */
+      width: 100%; /* */
+      height: 100%; /* */
+      z-index: 999; /* */
+      clip-path: circle(0% at top left); /* */
+      transition: clip-path 0.5s ease-in-out; /* */
+  }
+
+  .menu-mobile.active { /* */
+      clip-path: circle(150% at top left); /* */
+  }
+
+  .menu-mobile .btn-close { /* */
+      position: absolute;
+      top: 40px; /* */
+      right: 40px; /* */
+      cursor: pointer;
+      background: none;
+      outline: none;
+      border: none;
+      font-size: 22px; /* */
+  }
+
+  .menu-mobile .logo img { /* Adaptado de .menu-mobile .logo a de old.css */
+      width: 190px; /* */
+      height: auto;
+      margin-bottom: 20px;
+  }
+
+  .menu-mobile .navigation-mobile { /* */
+      display: flex;
+      flex-direction: column; /* */
+      gap: 15px; /* */
+  }
+
+  .menu-mobile .navigation-mobile a { /* */
+      text-decoration: none;
+      color: #333; /* */
+      font-weight: 500; /* */
+      text-align: center; /* */
+      font-size: 22px; /* */
+  }
+
+  .menu-mobile .social-links { /* */
+      display: flex;
+      list-style: none;
+      padding: 0;
+      gap: 30px; /* */
+  }
+  .menu-mobile .social-links a {
+      color: #333; /* Similar a nav links */
+  }
+
+  .menu-mobile .social-links i { /* */
+      font-size: 26px; /* */
+  }
+
+
+  /* Nueva Sección Principal: Conócenos y Sidebar */
+  .main-section-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 20px 0; /* Padding vertical, horizontal vendrá de .container */
+      margin-top: 20px; /* Espacio después del header (si no es fijo) o como separación */
+      margin-bottom: 20px;
+  }
+
+  .conocenos-section {
+      flex: 2; 
+      min-width: 300px;
+  }
+
+  .conocenos-section h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+      color: #004a99; /* Un azul más oscuro para el H1 principal */
+  }
+
+  .conocenos-section p {
+      font-size: 1.1em;
+      line-height: 1.6;
+      margin-bottom: 20px;
+  }
+
+  .conocenos-section img {
+      width: 100%;
+      max-width: 600px; 
+      height: auto;
+      border-radius: 8px;
+      margin-top: 20px;
+  }
+
+  .sidebar-info {
+      flex: 1; 
+      background-color: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      min-width: 280px;
+  }
+
+  .sidebar-info h2 {
+      font-size: 1.8em; /* Reducido de 45px para sidebar */
+      margin-bottom: 15px;
+      color: #F5B238; /* Color de old.css .main-content h2 */ /* */
+      font-weight: 600;
+  }
+
+  .sidebar-info p {
+      font-size: 1em;
+      line-height: 1.5;
+      margin-bottom: 15px;
+  }
+
+  .sidebar-info img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-top: 10px;
+  }
+
+  /* Sección Carrusel de Imágenes */
+  .carousel-section {
+      padding: 20px 0;
+      text-align: center; /* Para centrar el h2 si .container no lo hace */
+      background-color: #e9ecef;
+      margin-bottom: 20px;
+  }
+
+  .carousel-section h2 {
+      font-size: 2em; /* Reducido de 45px */
+      margin-bottom: 20px;
+      color: #F5B238; /* Color de old.css .main-content h2 */ /* */
+      font-weight: 600;
+      text-align: center;
+  }
+
+  .carousel-container {
+      display: flex;
+      overflow-x: auto; 
+      gap: 15px;
+      padding-bottom: 15px; 
+  }
+
+  .carousel-container img {
+      width: 250px; 
+      height: 180px; 
+      object-fit: cover; 
+      border-radius: 8px;
+      flex-shrink: 0; 
+  }
+
+  /* Footer Styles (adaptado de old.css y combinando) */
+  .footer-style {
+      background-color: #E0DB1D; /* */
+      color: #000; /* Texto oscuro para contraste */
+      padding: 20px 0;
+      margin-top: 30px; /* */
+  }
+
+  .footer-style .container {
+      padding-top: 10px; /* Reducido */
+      padding-bottom: 10px; /* Reducido */
+  }
+  
+  .footer-style footer { /* Contenedor interno del footer */
+      display: flex;
+      flex-direction: column;
+  }
+
+  .footer-style .first-section,
+  .footer-style .second-section-wrapper { /* Nuevo wrapper para second-section y email */
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 10px 0;
+  }
+   .footer-style .first-section {
+      padding-bottom: 15px; /* */
+      border-bottom: 1px solid #444; /* Color de borde más oscuro sobre fondo amarillo */ /* Similar a #f3f2f4 de old.css pero ajustado */ /* */
+      margin-bottom: 15px;
+  }
+
+  .footer-style .logo a { /* */
+      font-family:'Segoe UI', sans-serif; /* */
+      font-weight: 700; /* */
+      text-decoration: none; /* */
+      color: black; /* */
+      font-size: 30px; /* */
+  }
+
+  .footer-style .navigation-footer { /* */
+      display: flex;
+      gap: 30px; /* */
+  }
+  .footer-style .navigation-footer a { /* */
+      text-decoration: none;
+      color: #000; /* */
+      font-weight: 500; /* */
+  }
+  .footer-style .navigation-footer a:hover { /* */
+      text-decoration: underline; /* */
+  }
+  
+  /* Email Subscription en Footer */
+  .email-subscription {
+      padding: 15px 0;
+      text-align: center;
+      width: 100%; /* Ocupar todo el ancho disponible en el flex container */
+      margin-bottom: 15px; /* Espacio antes de la copyright y social links */
+  }
+  .email-subscription h3 {
+      color: #000;
+      margin-bottom: 10px;
+      font-size: 1.2em;
+  }
+  .email-subscription input[type="email"] {
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #adadad; /* Borde más visible */
+      margin-right: 5px;
+      width: 250px;
+      max-width: 70%;
+      background-color: #fff; /* Fondo blanco para input */
+      color: #333;
+  }
+  .email-subscription button {
+      padding: 10px 15px;
+      border-radius: 4px;
+      border: none;
+      background-color: #007bff; /* Azul para el botón */
+      color: white;
+      cursor: pointer;
+      font-family: "Poppins", sans-serif;
+      font-weight: 500;
+  }
+  .email-subscription button:hover {
+      background-color: #0056b3;
+  }
+
+  /* Second section of footer from old.css */
+  .footer-style .second-section { /* */
+      padding: 10px 0; /* Reducido */ /* */
+      display: flex; /* */
+      justify-content: space-between; /* */
+      align-items: center;
+      width: 100%;
+  }
+
+  .footer-style .copyright { /* */
+      font-size: 18px; /* */
+      color: #000;
+  }
+
+  .footer-style .social-links { /* */
+      list-style: none; /* */
+      padding: 0;
+      display: flex; /* */
+      gap: 25px; /* */
+  }
+  .footer-style .social-links a { /* */
+      text-decoration: none; /* */
+      color: #000; /* */
+  }
+  .footer-style .social-links a i { /* */
+      font-size: 22px; /* */
+  }
+
+  /* Media Queries (combinando y adaptando) */
+  @media (max-width: 768px) { /* */
+      body {
+          padding-top: 77px; /* Ajuste para header en móvil si su altura cambia */
+      }
+      header {
+          padding: 15px; /* */
+      }
+      header .navigation-header {
+          display: none; /* */
+      }
+      header .btn-menu-responsive {
+          display: block; /* Muestra el botón de hamburguesa */
+      }
+      .logo img { /* */
+         width: 150px; /* Ajuste para pantallas pequeñas de old.css */
+      }
+
+      .main-section-container {
+          flex-direction: column; 
+          padding: 15px 3%;
+      }
+
+      .conocenos-section h1 {
+          font-size: 2.5em;
+      }
+      .sidebar-info h2, .carousel-section h2 {
+          font-size: 1.5em; /* Reducir más en móvil */
+      }
+
+      .footer-style .first-section,
+      .footer-style .second-section-wrapper,
+      .footer-style .second-section {
+          flex-direction: column;
+          text-align: center;
+      }
+      .footer-style .navigation-footer a {
+          margin: 5px 0;
+          display: block;
+      }
+      .footer-style .social-links {
+          justify-content: center; /* */
+          margin-top: 10px;
+      }
+       .footer-style .social-links li {
+           margin: 0 10px;
+      }
+      .footer-style .copyright { /* */
+          font-size: 16px; /* */
+          text-align: center; /* */
+          margin-bottom: 10px;
+      }
+  }
+  @media (min-width: 769px) { /* Para ocultar botón responsive en desktop */
+      header .btn-menu-responsive {
+          display: none; /* */
+      }
+  }

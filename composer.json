@@ -1,0 +1,19 @@
+{
+    "name": "ods/educacion",
+    "description": "Plataforma web para cubrir el ODS de educación de calidad, proyecto de tecnologías web",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Kippie01PW",
+            "email": "146268821+Kippie01PW@users.noreply.github.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}

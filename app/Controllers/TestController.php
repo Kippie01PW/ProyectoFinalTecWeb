@@ -3,7 +3,9 @@ namespace App\Controllers;
 
 class TestController {
     public function saludar() {
-        echo "¡Autoload funciona!";
+        echo "¡Hola mundo!";
+        echo "<br>"; 
+        echo "©Todos los derechos reservados a mi XD 2025"; 
     }
 }
 

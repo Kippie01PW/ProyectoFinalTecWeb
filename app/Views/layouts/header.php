@@ -11,24 +11,22 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-custom-green py-3">
         <div class="container">
-            <!-- Logo a la izquierda -->
-            <a class="navbar-brand" href="/">
+        
+            <a class="navbar-brand" href="#">
                 <img src="/PROYECTOFINALTECWEB/public/assets/images/NexoLearn_logo_narvar.png"  
                      class="navbar-logo" 
                      alt="Logo Educación ODS">
             </a>
             
-            <!-- Botón para móviles -->
             <button class="navbar-toggler" type="button" 
                     data-bs-toggle="collapse" 
                     data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <!-- Menú a la derecha -->
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
-                    <li class="nav-item me-3"> <!-- Margen derecho de 1rem -->
+                    <li class="nav-item me-3">
                         <a class="nav-link" href="/?action=auth/login">
                             <i class="bi bi-box-arrow-in-right me-1"></i>
                             Iniciar Sesión

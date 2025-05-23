@@ -43,3 +43,27 @@
     .text-muted {
     color: white !important;
 }
+
+.text-custom-green {
+        color: #4CAF50;
+    }
+    
+    .carousel-item {
+        height: 60vh;
+        min-height: 400px;
+    }
+    
+    .carousel-item img {
+        object-fit: cover;
+        height: 100%;
+        width: 100%;
+    }
+    
+    .list-group-item {
+        border-color: rgba(76, 175, 80, 0.2);
+        padding: 1rem 1.5rem;
+    }
+    
+    .shadow {
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }

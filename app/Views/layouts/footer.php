@@ -3,7 +3,7 @@
 <footer class="bg-dark text-white py-5 mt-5">
     <div class="container">
         <div class="row">
-            <!-- Columna Izquierda - Políticas -->
+
             <div class="col-md-4 mb-4">
                 <h5 class="text-custom-green mb-3">Legalidad</h5>
                 <ul class="list-unstyled">
@@ -22,7 +22,6 @@
                 </ul>
             </div>
 
-            <!-- Columna Central - Logo -->
             <div class="col-md-4 mb-4 text-center">
                 <a href="/" class="d-inline-block">
                     <img src="/PROYECTOFINALTECWEB/public/assets/images/NexoLearn_logo.png" 
@@ -32,7 +31,6 @@
                 </a>
             </div>
 
-            <!-- Columna Derecha - Contacto -->
             <div class="col-md-4 mb-4">
                 <h5 class="text-custom-green mb-3">Contacto</h5>
                 <div class="mb-3">

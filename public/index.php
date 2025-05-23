@@ -1,6 +1,18 @@
-<?php include __DIR__ . '/../app/Views/layouts/header.php'; ?>
+<?php
+require_once __DIR__ . '/../app/config/config.php';
+require_once __DIR__ . '/../app/core/Conexion.php';
 
-<h1>Bienvenido a la página principal</h1>
-<p>Hola mundo, ya no se que más decir</p>
+$action = $_GET['action'] ?? 'home';
 
-<?php include __DIR__ . '/../app/Views/layouts/footer.php'; ?>
+switch ($action) {
+    case 'auth/login':
+        (new AuthController())->login();
+        break;
+    case 'auth/register':
+        (new AuthController())->register();
+        break;
+    default: 
+        require_once APP_ROOT . '/Views/home.php';
+        break;
+}
+?>

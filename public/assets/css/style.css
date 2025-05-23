@@ -1,11 +1,45 @@
 .navbar-logo {
             max-height: 40px;
-            margin-right: 10px;
+            margin-right: 15px;
+        }
+
+.bg-custom-green {
+            background-color: #4CAF50 !important; 
         }
 
 
- .navbar-logo:hover, .footer-logo:hover {
-     opacity: 0.8;
-     transform: scale(1.05);
-     transition: all 0.3s ease;
- }
+
+.navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            transition: all 0.3s ease;
+        }
+
+.navbar-nav .nav-link:hover {
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+    .hover-green:hover {
+        color: #4CAF50 !important;
+        transition: color 0.3s ease;
+    }
+    
+    .text-custom-green {
+        color: #4CAF50;
+    }
+    
+    .footer-logo {
+        transition: transform 0.3s ease;
+    }
+    
+    .footer-logo:hover {
+        transform: scale(1.05);
+    }
+    
+    .bg-dark {
+        background-color: #1a1a1a !important;
+    }
+
+    .text-muted {
+    color: white !important;
+}

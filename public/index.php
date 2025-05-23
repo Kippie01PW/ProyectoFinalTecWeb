@@ -1,7 +1,6 @@
-<?php
+<?php include __DIR__ . '/../app/Views/layouts/header.php'; ?>
 
-require_once '../vendor/autoload.php';
-$prueba = new \App\Controllers\TestController();
-$prueba->saludar();
+<h1>Bienvenido a la página principal</h1>
+<p>Contenido de ejemplo...</p>
 
-?>
+<?php include __DIR__ . '/../app/Views/layouts/footer.php'; ?>

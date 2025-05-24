@@ -1,6 +1,7 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /ProyectoFinalTecWeb/public/
+    
+    RewriteBase /ProyectoFinalTecWeb/public
 
     # Redirige todas las peticiones que no sean a archivos o directorios existentes a index.php
     RewriteCond %{REQUEST_FILENAME} !-f

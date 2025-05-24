@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Core\Conexion;
-class AlumnoModel {
+class AlumnoModelRegister {
     private $db;
 
     public function __construct() {

@@ -2,7 +2,7 @@
 namespace App\Controllers; 
 
 use App\Models\UsuarioModel;
-use App\Models\AlumnoModel;
+use App\Models\AlumnoModelRegister;
 use App\Models\MaestroModel;
 
 class AuthController {
@@ -25,7 +25,7 @@ class AuthController {
 
             if ($usuarioId) {
                 if ($role === 'alumno') {
-                    $alumnoModel = new AlumnoModel();
+                    $alumnoModel = new AlumnoModelRegister();
                     $alumnoModel->createAlumno($usuarioId, $username);
                 } else {
                     $maestroModel = new MaestroModel();

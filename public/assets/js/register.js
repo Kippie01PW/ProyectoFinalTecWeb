@@ -16,7 +16,7 @@ $(document).ready(function() {
                         </div>
                     `);
                     setTimeout(() => {
-                        window.location.href = "/PROYECTOFINALTECWEB/?action=auth/login";
+                        window.location.href = response.redirect;;
                     }, 1500);
                 } else {
                     $('#message').html(`

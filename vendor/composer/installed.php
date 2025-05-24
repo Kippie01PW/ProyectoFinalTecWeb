@@ -3,7 +3,7 @@
         'name' => 'ods/educacion',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'b63ed13c05ba6c7d55c0f27f8b9e5aef8db334d7',
+        'reference' => '0d80561d2f5cd9dc511bc4b10cb7c5eab4006d3b',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -31,7 +31,7 @@
         'ods/educacion' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'b63ed13c05ba6c7d55c0f27f8b9e5aef8db334d7',
+            'reference' => '0d80561d2f5cd9dc511bc4b10cb7c5eab4006d3b',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

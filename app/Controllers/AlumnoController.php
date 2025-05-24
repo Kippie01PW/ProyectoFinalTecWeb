@@ -1,40 +1,58 @@
 <?php
 
-namespace App\Controllers; 
+namespace App\Controllers;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-// Podríamos necesitar la conexión y PDO más adelante:
-// use App\Core\Conexion;
-// use PDO;
+use App\Core\Conexion;   
+use App\Models\AlumnoModel; 
+use PDO;                 
 
-/**
- * Controlador para gestionar las funcionalidades del Alumno.
- */
+
 class AlumnoController
 {
 
     /**
-     * Obtiene los cursos asignados al alumno.
      * Ruta: GET /api/alumnos/cursos/asignados
      */
     public function getCursosAsignados(Request $request, Response $response, $args)
     {
-        // --- Lógica Temporal ---
-        // Aquí obtendríamos el ID del alumno de la sesión.
-        // Luego llamaríamos al Modelo para buscar en la BD.
-        $data = ['message' => 'API: Aqui se mostraran tus cursos asignados.'];
-        
-        // Convertimos el array a JSON
-        $payload = json_encode($data);
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
 
-        // Escribimos el JSON en la respuesta
-        $response->getBody()->write($payload);
 
-        // Devolvemos la respuesta con el tipo de contenido y el código de estado
-        return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(200); // 200 OK
+        $alumno_id = $_SESSION['alumno_id'] ?? 1; // Usamos 1 como default para pruebas
+
+        try {
+            // 3. Obtener Conexión PDO
+            //    Creamos una nueva instancia de nuestra clase Conexion y obtenemos el objeto PDO.
+            $pdo = (new Conexion())->getConexion();
+
+            // 4. Instanciar el Modelo, pasando la conexión PDO
+            $alumnoModel = new AlumnoModel($pdo);
+
+            // 5. Llamar al método del Modelo para obtener los cursos
+            $cursos = $alumnoModel->findCursosAsignados($alumno_id);
+
+            // 6. Preparar la respuesta JSON con los datos reales
+            $payload = json_encode($cursos);
+            $response->getBody()->write($payload);
+
+            // 7. Devolver la respuesta
+            return $response
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStatus(200); // 200 OK
+
+        } catch (\Exception $e) {
+            // Si algo sale mal (ej: error de BD), devolvemos un error 500.
+            $errorData = ['error' => 'No se pudieron obtener los cursos asignados.', 'message' => $e->getMessage()];
+            $payload = json_encode($errorData);
+            $response->getBody()->write($payload);
+            return $response
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStatus(500); // 500 Internal Server Error
+        }
     }
 
     /**
@@ -43,6 +61,7 @@ class AlumnoController
      */
     public function getCursosCompletados(Request $request, Response $response, $args)
     {
+        // TODO: Implementar usando el Modelo como hicimos arriba.
         $data = ['message' => 'API: Aquí se mostrará tu historial de cursos completados.'];
         $payload = json_encode($data);
         $response->getBody()->write($payload);
@@ -57,6 +76,7 @@ class AlumnoController
      */
     public function getMisClases(Request $request, Response $response, $args)
     {
+        // TODO: Implementar usando el Modelo.
         $data = ['message' => 'API: Aquí se mostrarán las clases a las que perteneces.'];
         $payload = json_encode($data);
         $response->getBody()->write($payload);
@@ -71,17 +91,16 @@ class AlumnoController
      */
     public function unirseAClase(Request $request, Response $response, $args)
     {
-        // Obtenemos los datos enviados en el cuerpo de la petición (ej: desde un form AJAX)
+        // TODO: Implementar usando el Modelo.
         $parsedBody = $request->getParsedBody();
-        $codigo = $parsedBody['codigo'] ?? null; // Buscamos el 'codigo'
+        $codigo = $parsedBody['codigo'] ?? null;
 
         if ($codigo) {
-            // Aquí iría la lógica para validar el código y registrar al alumno en la clase.
             $data = ['message' => "API: Te has unido (simulado) a la clase con código: " . htmlspecialchars($codigo)];
-            $status = 200; // OK
+            $status = 200;
         } else {
             $data = ['error' => 'No se proporcionó un código de clase.'];
-            $status = 400; // Bad Request (Falta información)
+            $status = 400;
         }
 
         $payload = json_encode($data);

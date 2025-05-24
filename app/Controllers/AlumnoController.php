@@ -86,37 +86,73 @@ class AlumnoController
         }
     }
 
-    /**
+/**
      * Obtiene las clases a las que pertenece el alumno.
      * Ruta: GET /api/alumnos/clases
      */
     public function getMisClases(Request $request, Response $response, $args)
     {
-        // TODO: Implementar usando el Modelo.
-        $data = ['message' => 'API: Aquí se mostrarán las clases a las que perteneces.'];
-        $payload = json_encode($data);
-        $response->getBody()->write($payload);
-        return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(200);
+        if (session_status() == PHP_SESSION_NONE) { session_start(); }
+        $alumno_id = $_SESSION['alumno_id'] ?? 1; // Usamos 1 para pruebas
+
+        try {
+            $pdo = (new Conexion())->getConexion();
+            $alumnoModel = new AlumnoModel($pdo);
+            // ¡Llamamos al nuevo método!
+            $clases = $alumnoModel->findMisClases($alumno_id); 
+
+            $payload = json_encode($clases);
+            $response->getBody()->write($payload);
+            return $response
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStatus(200);
+
+        } catch (\Exception $e) {
+            $errorData = ['error' => 'No se pudieron obtener las clases.', 'message' => $e->getMessage()];
+            $payload = json_encode($errorData);
+            $response->getBody()->write($payload);
+            return $response
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStatus(500);
+        }
     }
 
-    /**
+/**
      * Permite al alumno unirse a una clase.
      * Ruta: POST /api/alumnos/clases/unirse
      */
     public function unirseAClase(Request $request, Response $response, $args)
     {
-        // TODO: Implementar usando el Modelo.
+        if (session_status() == PHP_SESSION_NONE) { session_start(); }
+        $alumno_id = $_SESSION['alumno_id'] ?? 1; // Usamos 1 para pruebas
+
+        // Obtenemos los datos del cuerpo de la petición POST (esperamos JSON)
         $parsedBody = $request->getParsedBody();
         $codigo = $parsedBody['codigo'] ?? null;
 
-        if ($codigo) {
-            $data = ['message' => "API: Te has unido (simulado) a la clase con código: " . htmlspecialchars($codigo)];
-            $status = 200;
-        } else {
+        // Validamos que nos hayan enviado un código.
+        if (empty($codigo)) {
             $data = ['error' => 'No se proporcionó un código de clase.'];
-            $status = 400;
+            $status = 400; // 400 Bad Request
+        } else {
+            try {
+                $pdo = (new Conexion())->getConexion();
+                $alumnoModel = new AlumnoModel($pdo);
+                // Llamamos al método del modelo.
+                $success = $alumnoModel->joinClaseByCodigo($alumno_id, $codigo);
+
+                if ($success) {
+                    $data = ['message' => "Te has unido exitosamente a la clase con código: " . htmlspecialchars($codigo)];
+                    $status = 200; // 200 OK
+                } else {
+                    $data = ['error' => "No se pudo unir a la clase. El código '" . htmlspecialchars($codigo) . "' podría ser incorrecto o ya estás inscrito."];
+                    $status = 404; // 404 Not Found (o podría ser 409 Conflict / 500)
+                }
+
+            } catch (\Exception $e) {
+                $data = ['error' => 'Ocurrió un error interno al intentar unirse a la clase.', 'message' => $e->getMessage()];
+                $status = 500; // 500 Internal Server Error
+            }
         }
 
         $payload = json_encode($data);

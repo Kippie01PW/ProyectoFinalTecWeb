@@ -34,7 +34,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link btn btn-outline-light" 
-                           href="/?action=auth/register">
+                           href="/PROYECTOFINALTECWEB/?action=auth/register">
                             Registrarse
                         </a>
                     </li>

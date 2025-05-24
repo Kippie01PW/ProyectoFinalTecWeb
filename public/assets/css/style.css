@@ -75,3 +75,60 @@
 .dropdown-menu {
     border: 1px solid rgba(76, 175, 80, 0.15);
 }
+
+/*La sección del form de registro*/
+body.register {
+    background: linear-gradient(to right, var(--verde-primario), var(--azul-fondo), var(--amarillo-fondo)) !important;
+}
+
+    :root {
+        --verde-primario: #4CAF50;
+        --verde-titulo-encabezado: #3c7cdb;    
+        --naranja-logo: #FF6B35;      
+        --azul-logo: #004E89;         
+        --texto-oscuro: #2D2D2D;  
+        --azul-fondo: #51e7c9; 
+        --amarillo-fondo: #f3ed45;   
+        --verde-hover: #428805;  
+        --rojo-registro:#ed5f5f; 
+    }
+
+    .card-registro {
+        border: 2px solid var(--verde-primario);
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .card-header-registro {
+        background: var(--verde-titulo-encabezado);
+        padding: 1.5rem;
+    }
+
+    .titulo-registro {
+        color: white;
+        font-weight: 700;
+        text-align: center;
+        margin: 0;
+    }
+
+    .btn-registro {
+        background: var(--rojo-registro);
+        border: none;
+        padding: 12px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .btn-registro:hover {
+        background: var(--verde-hover);
+        transform: translateY(-2px);
+    }
+
+    .enlace-login {
+        color: var(--azul-logo);
+        font-weight: 500;
+    }
+
+    .enlace-login:hover {
+        color: var(--naranja-logo);
+    }

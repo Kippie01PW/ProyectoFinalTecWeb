@@ -3,7 +3,8 @@
 namespace App\Models;
 
 use App\Core\Conexion;
-class AlumnoModel {
+
+class MaestroModel {
     private $db;
 
     public function __construct() {
@@ -11,8 +12,8 @@ class AlumnoModel {
         $this->db = $conexion->getConexion();
     }
 
-    public function createAlumno($usuarioId, $nombre) {
-        $sql = "INSERT INTO alumno (usuario_id, nombre) VALUES (:usuario_id, :nombre)";
+    public function createMaestro($usuarioId, $nombre) {
+        $sql = "INSERT INTO maestro (usuario_id, nombre) VALUES (:usuario_id, :nombre)";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             ':usuario_id' => $usuarioId,

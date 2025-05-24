@@ -55,19 +55,35 @@ class AlumnoController
         }
     }
 
-    /**
+/**
      * Obtiene los cursos completados por el alumno.
      * Ruta: GET /api/alumnos/cursos/completados
      */
     public function getCursosCompletados(Request $request, Response $response, $args)
     {
-        // TODO: Implementar usando el Modelo como hicimos arriba.
-        $data = ['message' => 'API: Aquí se mostrará tu historial de cursos completados.'];
-        $payload = json_encode($data);
-        $response->getBody()->write($payload);
-        return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(200);
+        if (session_status() == PHP_SESSION_NONE) { session_start(); }
+        $alumno_id = $_SESSION['alumno_id'] ?? 1; // Usamos 1 para pruebas
+
+        try {
+            $pdo = (new Conexion())->getConexion();
+            $alumnoModel = new AlumnoModel($pdo);
+            // ¡Llamamos al nuevo método!
+            $cursos = $alumnoModel->findCursosCompletados($alumno_id); 
+
+            $payload = json_encode($cursos);
+            $response->getBody()->write($payload);
+            return $response
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStatus(200);
+
+        } catch (\Exception $e) {
+            $errorData = ['error' => 'No se pudieron obtener los cursos completados.', 'message' => $e->getMessage()];
+            $payload = json_encode($errorData);
+            $response->getBody()->write($payload);
+            return $response
+                    ->withHeader('Content-Type', 'application/json')
+                    ->withStatus(500);
+        }
     }
 
     /**

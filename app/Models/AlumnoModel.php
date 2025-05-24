@@ -60,17 +60,39 @@ class AlumnoModel
         }
     }
 
-    /**
+/**
      * Busca y devuelve los cursos completados por un alumno específico.
-     * (Lo implementaremos más adelante)
      *
      * @param int $alumnoId El ID del alumno.
-     * @return array
+     * @return array Un array con los datos de los cursos completados.
      */
     public function findCursosCompletados(int $alumnoId): array
     {
-        // TODO: Implementar la consulta SQL para cursos completados
-        return [['id' => 99, 'titulo' => 'Curso Completado de Prueba', 'descripcion' => 'Aún por implementar']];
+        // La consulta es casi idéntica, solo cambia el estado.
+        $sql = "SELECT
+                    c.id,
+                    c.titulo,
+                    c.descripcion,
+                    c.enlace_externo,
+                    cat.nombre as categoria_nombre,
+                    ac.fecha_completado,
+                    ac.evidencia
+                FROM alumnocurso ac
+                JOIN cursos c ON ac.curso_id = c.id
+                LEFT JOIN categoriascurso cat ON c.categoria_id = cat.id
+                WHERE ac.alumno_id = :alumno_id
+                AND ac.estado = 'completado' -- <-- ¡El cambio clave!
+                ORDER BY ac.fecha_completado DESC";
+
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':alumno_id', $alumnoId, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            error_log("Error en AlumnoModel::findCursosCompletados: " . $e->getMessage());
+            return [];
+        }
     }
 
     /**

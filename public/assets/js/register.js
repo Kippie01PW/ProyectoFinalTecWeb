@@ -5,7 +5,7 @@ $(document).ready(function() {
 
         $.ajax({
             type: "POST",
-            url: "/ProyectoFinalTecWeb/public/api/auth/register", 
+            url: "/PROYECTOFINALTECWEB/?action=auth/register",
             data: $(this).serialize(),
             dataType: "json",
             success: function(response) {
@@ -16,7 +16,7 @@ $(document).ready(function() {
                         </div>
                     `);
                     setTimeout(() => {
-                        window.location.href = "/ProyectoFinalTecWeb/public/login";
+                        window.location.href = response.redirect;;
                     }, 1500);
                 } else {
                     $('#message').html(`

@@ -27,7 +27,7 @@
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item me-3">
-                        <a class="nav-link" href="/?action=auth/login">
+                        <a class="nav-link" href="/PROYECTOFINALTECWEB/?action=auth/login">
                             <i class="bi bi-box-arrow-in-right me-1"></i>
                             Iniciar Sesión
                         </a>

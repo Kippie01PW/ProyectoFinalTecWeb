@@ -1,95 +1,87 @@
 <?php
 namespace App\Controllers;
 
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Models\UsuarioModel;
 use App\Models\AlumnoModelRegister;
 use App\Models\MaestroModel;
 
 class AuthController {
+    public function register() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $username = trim($_POST['username']);
+            $email = trim($_POST['email']);
+            $password = $_POST['password'];
+            $role = $_POST['role'];
 
-    /**
-     * Muestra el formulario de registro.
-     * Llamado por la ruta: GET /register
-     */
-    public function showRegisterForm(Request $request, Response $response, $args)
-    {
-        ob_start();
-        // APP_ROOT debería estar definido por public/index.php
-        require_once APP_ROOT . '/Views/auth/register.php';
-        $output = ob_get_clean();
-        $response->getBody()->write($output);
-        return $response;
-    }
+            if (empty($username) || empty($email) || empty($password)) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Todos los campos son obligatorios.']);
+                exit;
+            }
 
-    /**
-     * Procesa los datos del formulario de registro.
-     * Llamado por la ruta: POST /api/auth/register
-     */
-    public function processRegistration(Request $request, Response $response, $args)
-    {
-        // 1. Obtenemos los datos (Slim los parsea automáticamente)
-        $data = $request->getParsedBody();
-
-        $username = trim($data['username'] ?? '');
-        $email = trim($data['email'] ?? '');
-        $password = $data['password'] ?? '';
-        $role = $data['role'] ?? '';
-
-        // 2. Validación
-        if (empty($username) || empty($email) || empty($password) || empty($role)) {
-            $responseData = ['success' => false, 'message' => 'Todos los campos son obligatorios.'];
-            $response->getBody()->write(json_encode($responseData));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
-        }
-
-        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-        $usuarioModel = new UsuarioModel();
-
-        try {
-            // 3. Crear Usuario
+            $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+            $usuarioModel = new UsuarioModel();
             $usuarioId = $usuarioModel->createUser($username, $email, $passwordHash, $role);
 
             if ($usuarioId) {
-                $profileCreated = false;
-                // 4. Crear Perfil (Alumno o Maestro)
                 if ($role === 'alumno') {
                     $alumnoModel = new AlumnoModelRegister();
-                    $profileCreated = $alumnoModel->createAlumno($usuarioId, $username);
-                } elseif ($role === 'maestro') {
-                    $maestroModel = new MaestroModel();
-                    $profileCreated = $maestroModel->createMaestro($usuarioId, $username);
-                }
-
-                if ($profileCreated) {
-                    $responseData = ['success' => true, 'message' => '¡Registro exitoso!'];
-                    $status = 201; // 201 Created
+                    $alumnoModel->createAlumno($usuarioId, $username);
                 } else {
-                     $responseData = ['success' => false, 'message' => 'Error al crear el perfil específico.'];
-                     $status = 500;
+                    $maestroModel = new MaestroModel();
+                    $maestroModel->createMaestro($usuarioId, $username);
                 }
+                session_start();
+                $_SESSION['user_id'] = $usuarioId;
+                $_SESSION['role'] = $role;
 
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => true,
+                    'redirect' => "/PROYECTOFINALTECWEB/{$role}/dashboard"
+                ]);
             } else {
-                $responseData = ['success' => false, 'message' => 'Error al registrar el usuario. ¿Email o usuario ya existen?'];
-                $status = 409; // 409 Conflict (o 400 Bad Request)
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Error al registrar.']);
             }
-
-        } catch (\PDOException $e) {
-             $responseData = ['success' => false, 'message' => 'Error de base de datos.'];
-             $status = 500;
-             error_log("PDOException en Registro: " . $e->getMessage()); // Log real del error
-        } catch (\Exception $e) {
-             $responseData = ['success' => false, 'message' => 'Error inesperado.'];
-             $status = 500;
-             error_log("Exception en Registro: " . $e->getMessage()); // Log real del error
+            exit;
+        } else {
+            include __DIR__ . '/../Views/auth/register.php';
         }
-
-        // 5. Devolver respuesta JSON
-        $response->getBody()->write(json_encode($responseData));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
     }
 
-    // Aquí añadiremos showLoginForm y processLogin más adelante...
+    public function login() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $email = trim($_POST['email']);
+            $password = $_POST['password'];
+
+            if (empty($email) || empty($password)) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Correo y contraseña son obligatorios.']);
+                exit;
+            }
+
+            $usuarioModel = new UsuarioModel();
+            $usuario = $usuarioModel->getUserByEmail($email);
+
+            if ($usuario && password_verify($password, $usuario['password_hash'])) {
+                session_start();
+                $_SESSION['user_id'] = $usuario['id'];
+                $_SESSION['role'] = $usuario['role'];
+
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => true,
+                    'redirect' => "/PROYECTOFINALTECWEB/{$usuario['role']}/dashboard"
+                ]);
+            } else {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Credenciales incorrectas.']);
+            }
+            exit;
+        } else {
+            include __DIR__ . '/../Views/auth/login.php';
+        }
+    }
 }
 ?>

@@ -1,5 +1,5 @@
 <?php
-
+session_start(); 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -36,9 +36,9 @@ $app->get('/', function (Request $request, Response $response, $args) {
     ob_start(); // Inicia el buffer de salida
 
 
-//    require APP_ROOT . '/Views/layouts/header.php';
+
     require APP_ROOT . '/Views/home.php';
-//    require APP_ROOT . '/Views/layouts/footer.php';
+
 
     $output = ob_get_clean(); // Obtiene el contenido del buffer y lo limpia
     $response->getBody()->write($output); // Escribe el HTML en la respuesta

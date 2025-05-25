@@ -133,4 +133,27 @@ $(document).ready(function () {
     }
 
     cargarDatosGuardados();
+    
+    $('#compartirMiId').on('click', function(e) {
+        e.preventDefault(); // Prevenir la acción por defecto del enlace href="#"
+
+        // Necesitamos obtener el alumno_id. Si no lo tenemos en JS,
+        // la forma más fácil es que PHP lo imprima en algún lugar.
+        // Por ejemplo, si en tu dashboard.php (alumno) o header_alumnos.php tienes:
+        // <script> var miAlumnoIdGlobal = <?php echo json_encode($_SESSION['alumno_id'] ?? null); ?>; </script>
+        // Entonces podrías usarlo aquí:
+
+        // FORMA MÁS DIRECTA (si PHP puede ponerlo en la página)
+        // Asumamos que tienes una variable JS global `miAlumnoIdGlobal` 
+        // o un elemento en el HTML que lo contenga.
+        // Por ejemplo, si lo pones en el body como un data-attribute:
+        // <body data-alumno-id="<?php echo htmlspecialchars($_SESSION['alumno_id'] ?? ''); ?>">
+        let alumnoId = $('body').data('alumno-id'); 
+
+        if (alumnoId) {
+            alert("Comparte este ID con tu profesor: " + alumnoId);
+        } else {
+            alert("No se pudo obtener tu ID. Asegúrate de haber iniciado sesión.");
+        }
+    });
 });

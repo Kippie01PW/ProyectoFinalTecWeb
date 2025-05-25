@@ -50,7 +50,7 @@
                     
                     <div class="text-center mt-4">
                         <p class="text-dark">¿Ya tienes cuenta? 
-                            <a href="/PROYECTOFINALTECWEB/?action=auth/login" class="enlace-login text-decoration-none">
+                            <a href="/ProyectoFinalTecWeb/public/login" class="enlace-login text-decoration-none">
                                 Inicia sesión aquí
                             </a>
                         </p>

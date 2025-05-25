@@ -233,9 +233,6 @@ class MaestroController {
         </script>";
     }
 
-    /**
-     * Genera solo los datos JSON para uso externo
-     */
     public function generarDatosJSON() {
         return [
             'textosPreguntas' => $this->preguntasTexto,

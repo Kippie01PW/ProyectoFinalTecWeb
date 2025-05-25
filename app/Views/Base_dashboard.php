@@ -1,18 +1,16 @@
 <?php 
-// Incluir el header
+
 include __DIR__ . '/layouts/header_maestro.php';
 
-// Incluir las clases
 require_once __DIR__ . '/../Models/Data_Maestro.php';
 require_once __DIR__ . '/../Controllers/MaestroController.php';
 
-// ID del maestro (puedes obtenerlo de la sesión o parámetro)
-$maestro_id = 4;
 
-// Crear instancia de la clase de consultas (ya no necesita parámetros de conexión)
+session_start();
+$maestro_id = $_SESSION['user_id'] ?? 4;
+
 $dashboard = new Data_Maestro($maestro_id);
 
-// Obtener todos los datos necesarios
 $datosPreguntas = $dashboard->getDatosPreguntas();
 $preguntasTexto = $dashboard->getPreguntasTexto();
 $totalAlumnos = $dashboard->getTotalAlumnos();
@@ -21,7 +19,6 @@ $alumnosTerminados = $dashboard->getAlumnosTerminados();
 $maestro = $dashboard->getDatosMaestro();
 $datosProgreso = $dashboard->getDatosProgreso();
 
-// Crear instancia del manejador de JavaScript
 $jsHandler = new MaestroController($datosPreguntas, $preguntasTexto, $datosProgreso);
 ?>
 
@@ -35,7 +32,6 @@ $jsHandler = new MaestroController($datosPreguntas, $preguntasTexto, $datosProgr
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
-    <!-- SweetAlert2 para popups más elegantes -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
@@ -112,7 +108,7 @@ $jsHandler = new MaestroController($datosPreguntas, $preguntasTexto, $datosProgr
                         <div class="card-body">
                             <i class="bi bi-person-circle fs-1"></i>
                             <div class="card-body">
-                                <form id="formularioMaestro" action="actualizar_maestro.php" method="POST">
+                                <form id="formularioMaestro" action="Maestro_actu.php" method="POST">
                                     <input type="hidden" name="maestro_id" value="<?= $maestro_id ?>">
 
                                     <div class="mb-3">
@@ -182,18 +178,15 @@ $jsHandler = new MaestroController($datosPreguntas, $preguntasTexto, $datosProgr
 </div>
 
 <script>
-// Función para manejar las actualizaciones con popup
+
 function actualizarDato(tipo) {
-    let titulo, mensaje, valor, inputId;
+    let valor, inputId;
     
     if (tipo === 'correo') {
-        titulo = 'Actualizar Correo Electrónico';
-        mensaje = '¿Estás seguro de que deseas actualizar tu correo electrónico?';
         inputId = 'inputCorreo';
-        valor = document.getElementById(inputId).value;
+        valor = document.getElementById(inputId).value.trim();
         
-        // Validar email
-        if (!validarEmail(valor)) {
+        if (!valor || !validarEmail(valor)) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
@@ -202,13 +195,10 @@ function actualizarDato(tipo) {
             return;
         }
     } else if (tipo === 'contrasena') {
-        titulo = 'Actualizar Contraseña';
-        mensaje = '¿Estás seguro de que deseas actualizar tu contraseña?';
         inputId = 'inputContrasena';
         valor = document.getElementById(inputId).value;
         
-        // Validar contraseña
-        if (valor.length < 6) {
+        if (!valor || valor.length < 6) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
@@ -216,27 +206,20 @@ function actualizarDato(tipo) {
             });
             return;
         }
+        
+        if (!validarContrasena(valor)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'La contraseña debe contener al menos una mayúscula, una minúscula y un número'
+            });
+            return;
+        }
     }
     
-    // Mostrar popup de confirmación
-    Swal.fire({
-        title: titulo,
-        text: mensaje,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, actualizar',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Realizar la actualización
-            realizarActualizacion(tipo, valor);
-        }
-    });
+    realizarActualizacion(tipo, valor);
 }
 
-// Función para realizar la actualización vía AJAX
 function realizarActualizacion(tipo, valor) {
     const formData = new FormData();
     formData.append('maestro_id', <?= $maestro_id ?>);
@@ -247,8 +230,13 @@ function realizarActualizacion(tipo, valor) {
     } else if (tipo === 'contrasena') {
         formData.append('contrasena', valor);
     }
-    
-    // Mostrar loading
+
+    console.log('Datos enviados:', {
+        maestro_id: <?= $maestro_id ?>,
+        accion: tipo,
+        valor: valor
+    });
+
     Swal.fire({
         title: 'Actualizando...',
         text: 'Por favor espera',
@@ -257,37 +245,53 @@ function realizarActualizacion(tipo, valor) {
             Swal.showLoading();
         }
     });
-    
-    // Realizar petición AJAX
-    fetch('actualizar_maestro.php', {
+
+    fetch('../app/Controllers/Maestro_actu.php', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: '¡Actualizado!',
-                text: data.message || 'Los datos se han actualizado correctamente',
-                timer: 2000,
-                showConfirmButton: false
-            });
+    .then(response => {
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        return response.text(); 
+    })
+    .then(text => {
+        console.log('Response text:', text);
+        try {
+            const data = JSON.parse(text);
+            console.log('Parsed data:', data);
             
-            // Limpiar campo de contraseña si fue actualizada
-            if (tipo === 'contrasena') {
-                document.getElementById('inputContrasena').value = '';
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Actualizado!',
+                    text: data.message || 'Los datos se han actualizado correctamente',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                if (tipo === 'contrasena') {
+                    document.getElementById('inputContrasena').value = '';
+                }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Ocurrió un error al actualizar los datos'
+                });
             }
-        } else {
+        } catch (e) {
+            console.error('Error parsing JSON:', e);
+            console.error('Raw response:', text);
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: data.message || 'Ocurrió un error al actualizar los datos'
+                text: 'Error en la respuesta del servidor'
             });
         }
     })
     .catch(error => {
-        console.error('Error:', error);
+        console.error('Fetch error:', error);
         Swal.fire({
             icon: 'error',
             title: 'Error',
@@ -296,15 +300,17 @@ function realizarActualizacion(tipo, valor) {
     });
 }
 
-// Función para validar email
 function validarEmail(email) {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
 }
 
-// También puedes usar Bootstrap Modal si prefieres no usar SweetAlert2
+function validarContrasena(password) {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/;
+    return regex.test(password);
+}
+
 function mostrarModalBootstrap(tipo) {
-    // Código alternativo usando Bootstrap Modal nativo
     const modalHtml = `
         <div class="modal fade" id="modalActualizar" tabindex="-1">
             <div class="modal-dialog">
@@ -325,22 +331,20 @@ function mostrarModalBootstrap(tipo) {
         </div>
     `;
     
-    // Agregar modal al DOM si no existe
     if (!document.getElementById('modalActualizar')) {
         document.body.insertAdjacentHTML('beforeend', modalHtml);
     }
     
-    // Mostrar modal
     const modal = new bootstrap.Modal(document.getElementById('modalActualizar'));
     modal.show();
 }
 </script>
 
 <?php 
-// Generar el JavaScript
+
 echo $jsHandler->generarJavaScript();
 
-// Cerrar la conexión
+
 $dashboard->cerrarConexion();
 ?>
 

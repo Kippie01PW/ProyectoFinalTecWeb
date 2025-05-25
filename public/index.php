@@ -1,6 +1,6 @@
 <?php
 
-session_start(); // Iniciamos sesión al principio
+session_start(); 
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -10,7 +10,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use App\Controllers\AlumnoController;
-use App\Controllers\AuthController; // <-- Podemos prever su uso
+use App\Controllers\AuthController; 
 
 // 1. Cargar Autoloader de Composer
 require __DIR__ . '/../vendor/autoload.php';
@@ -18,11 +18,11 @@ require __DIR__ . '/../vendor/autoload.php';
 // 2. Cargar Configuración
 require __DIR__ . '/../app/config/config.php';
 
-// 3. Crear Instancia de Slim
+
 $app = AppFactory::create();
 
-// 4. Establecer Base Path (¡Muy importante!)
-$app->setBasePath('/ProyectoFinalTecWeb/public'); // <-- Ajusta si es necesario
+
+$app->setBasePath('/ProyectoFinalTecWeb/public'); 
 
 // 5. Añadir Middleware de Ruteo y Errores
 $app->addRoutingMiddleware();
@@ -47,10 +47,10 @@ $app->group('/api/alumnos', function ($group) {
     $group->post('/clases/unirse', AlumnoController::class . ':unirseAClase');
 });
 
-// Rutas para Autenticación (¡Las adaptaremos luego!)
-// Por ahora, podemos definir la ruta GET para mostrar el formulario
+// Rutas para Autenticación
+
 $app->get('/register', AuthController::class . ':showRegisterForm'); // <-- ¡NUEVO!
-$app->post('/api/auth/register', AuthController::class . ':register'); // <-- ¡NUEVO!
+$app->post('/api/auth/register', \App\Controllers\AuthController::class . ':processRegistration');
 
 // --- Fin de Rutas ---
 

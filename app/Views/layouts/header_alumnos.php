@@ -44,12 +44,12 @@
                             Mi Aprendizaje
                         </a>
                     </li>
-                    <li class="nav-item mx-2">
-                        <a class="nav-link" href="/ProyectoFinalTecWeb/public/alumnos/preferencias/formulario">
-                            <i class="bi bi-mortarboard me-1"></i>
-                            Formulario
-                        </a>
-                    </li>
+                                    <li class="nav-item mx-2">
+                    <a class="nav-link" href="/ProyectoFinalTecWeb/public/alumnos/preferencias/formulario">
+                        <i class="bi bi-mortarboard me-1"></i>
+                        Formulario
+                    </a>
+                </li>
                     <li class="nav-item dropdown mx-2">
                         <a class="nav-link dropdown-toggle" 
                            href="##" 

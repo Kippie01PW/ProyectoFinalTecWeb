@@ -81,7 +81,7 @@ $app->group('/api/alumnos', function ($group) {
     $group->post('/clases/unirse', AlumnoController::class . ':unirseAClase');
 
     //NUEVO
-    $group->post('/preferencias/guardar', PreferenciasAlumnoController::class . ':guardarPreferencias');
+    $group->get('/preferencias/formulario', \App\Controllers\PreferenciasAlumnoController::class . ':showFormulario');
 });
 
 // Rutas para Autenticación

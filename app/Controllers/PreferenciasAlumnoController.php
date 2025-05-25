@@ -10,7 +10,7 @@ class PreferenciasAlumnoController {
 
     public function showFormulario(Request $request, Response $response, $args) {
         ob_start();
-        require_once APP_ROOT . '/PROYECTOFINALTECWEB/Views/Formulario.php';
+        require_once APP_ROOT . '/Views/Formulario.php';
         $output = ob_get_clean();
         $response->getBody()->write($output);
         return $response;

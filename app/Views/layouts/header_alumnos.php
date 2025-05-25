@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/PROYECTOFINALTECWEB/public/assets/css/style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
 </head>
-<body>
+<body data-alumno-id="<?php echo htmlspecialchars($_SESSION['alumno_id'] ?? ''); ?>">
     <nav class="navbar navbar-expand-lg navbar-dark bg-custom-green py-3">
         <div class="container-fluid">
             <a class="navbar-brand" href="/ProyectoFinalTecWeb/public/alumnos/dashboard">
@@ -51,10 +51,9 @@
                     </a>
                 </li>
                 <li class="nav-item mx-2">
-                     <a class="nav-link" href="#">
-                        <i class="bi bi-share me-1"></i>
-                        Compartir ID
-                    </a>
+                <a class="nav-link" href="#" id="compartirMiId">
+                    <i class="bi bi-share me-1"></i> Compartir ID
+                </a>
                 </li>
                     <li class="nav-item dropdown mx-2">
                         <a class="nav-link dropdown-toggle" 

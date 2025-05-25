@@ -50,68 +50,36 @@ class AlumnoModel
             return [];
         }
     }
-
+/**
+     * Busca las clases a las que un alumno está directamente inscrito.
+     *
+     * @param int $alumnoId El ID del alumno.
+     * @return array Un array con los datos de las clases.
+     */
     public function findMisClases(int $alumnoId): array
     {
-        $sql = "SELECT DISTINCT cl.id, cl.codigo, cl.descripcion, m.nombre as nombre_maestro
-                FROM clases cl
-                JOIN cursos c ON cl.id = c.clase_id
-                JOIN alumnocurso ac ON c.id = ac.curso_id
+        // Usamos la nueva tabla alumnoclase
+        $sql = "SELECT
+                    cl.id,
+                    cl.codigo,
+                    cl.nombre AS nombre_clase, 
+                    cl.descripcion,
+                    m.nombre AS nombre_maestro
+                FROM alumnoclase acl
+                JOIN clases cl ON acl.clase_id = cl.id
                 JOIN maestro m ON cl.maestro_id = m.id
-                WHERE ac.alumno_id = :alumno_id";
+                WHERE acl.alumno_id = :alumno_id AND acl.estado = 'activo'
+                ORDER BY cl.nombre ASC"; // Ordenamos por nombre de clase
+
         try {
             $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':alumno_id', $alumnoId, PDO::PARAM_INT);
+            $stmt->bindParam(':alumno_id', $alumnoId, \PDO::PARAM_INT);
             $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\PDOException $e) {
             error_log("Error en AlumnoModel::findMisClases: " . $e->getMessage());
             return [];
         }
     }
-
-    public function joinClaseByCodigo(int $alumnoId, string $codigo): bool
-    {
-        $this->db->beginTransaction();
-        try {
-            $sqlClase = "SELECT id FROM clases WHERE codigo = :codigo LIMIT 1";
-            $stmtClase = $this->db->prepare($sqlClase);
-            $stmtClase->bindParam(':codigo', $codigo, PDO::PARAM_STR);
-            $stmtClase->execute();
-            $clase = $stmtClase->fetch(PDO::FETCH_ASSOC);
-
-            if (!$clase) { $this->db->rollBack(); return false; }
-            $claseId = $clase['id'];
-
-            $sqlCursos = "SELECT id FROM cursos WHERE clase_id = :clase_id";
-            $stmtCursos = $this->db->prepare($sqlCursos);
-            $stmtCursos->bindParam(':clase_id', $claseId, PDO::PARAM_INT);
-            $stmtCursos->execute();
-            $cursosIds = $stmtCursos->fetchAll(PDO::FETCH_COLUMN, 0);
-
-            if (empty($cursosIds)) { $this->db->commit(); return true; }
-
-            $sqlInsert = "INSERT INTO alumnocurso (alumno_id, curso_id, estado)
-                          SELECT :alumno_id, :curso_id, 'asignado'
-                          WHERE NOT EXISTS (
-                              SELECT 1 FROM alumnocurso
-                              WHERE alumno_id = :alumno_id_check AND curso_id = :curso_id_check
-                          )";
-            $stmtInsert = $this->db->prepare($sqlInsert);
-
-            foreach ($cursosIds as $cursoId) {
-                $stmtInsert->bindValue(':alumno_id', $alumnoId, PDO::PARAM_INT);
-                $stmtInsert->bindValue(':curso_id', $cursoId, PDO::PARAM_INT);
-                $stmtInsert->bindValue(':alumno_id_check', $alumnoId, PDO::PARAM_INT);
-                $stmtInsert->bindValue(':curso_id_check', $cursoId, PDO::PARAM_INT);
-                if (!$stmtInsert->execute()) { $this->db->rollBack(); return false; }
-            }
-            $this->db->commit();
-            return true;
-        } catch (\PDOException $e) {
-            $this->db->rollBack();
-            error_log("Error en AlumnoModel::joinClaseByCodigo: " . $e->getMessage());
-            return false;
-        }
-    }
+    
 }

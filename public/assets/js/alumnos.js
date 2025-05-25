@@ -1,6 +1,74 @@
 $(document).ready(function () {
     const baseUrl = "/ProyectoFinalTecWeb/public";
+    function cargarCursosAsignados() {
+        $.ajax({
+            url: baseUrl + "/api/alumnos/cursos/asignados", // URL de tu API
+            method: 'GET',
+            dataType: 'json',
+            success: function(cursos) {
+                $('#loading-asignados').hide(); // Oculta "Cargando..."
+                const tbody = $('#tabla-asignados tbody');
+                tbody.empty(); // Limpia la tabla por si acaso
 
+                if (cursos.length > 0) {
+                    cursos.forEach(function(curso) {
+                        tbody.append(`
+                            <tr>
+                                <td>${curso.titulo}</td>
+                                <td>${curso.descripcion_corta}</td> 
+                                <td>${curso.categoria_nombre}</td>
+                                <td><a href="${baseUrl}/alumnos/curso/${curso.id}" class="btn btn-primary">Ver Curso</a></td>
+                            </tr>
+                        `);
+                    });
+                    $('#tabla-asignados').show(); // Muestra la tabla
+                } else {
+                    $('#loading-asignados').html('No tienes cursos asignados.').show();
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error("Error al cargar cursos asignados:", textStatus, errorThrown, jqXHR.responseText);
+                $('#loading-asignados').html('<div class="alert alert-danger">Error al cargar los cursos asignados. Revisa la consola.</div>').show();
+            }
+        });
+    }
+    
+    function cargarCursosCompletados() {
+        $.ajax({
+            url: baseUrl + "/api/alumnos/cursos/completados", // URL de tu API
+            method: 'GET',
+            dataType: 'json',
+            success: function(cursos) {
+                $('#loading-completados').hide(); // Oculta "Cargando..."
+                const tbody = $('#tabla-completados tbody');
+                tbody.empty(); 
+
+                if (cursos.length > 0) {
+                    cursos.forEach(function(curso) {
+                        tbody.append(`
+                            <tr>
+                                <td>${curso.titulo}</td>
+                                <td>${curso.fecha_completado}</td>
+                                <td><a href="${baseUrl}/alumnos/evidencia/${curso.id}" class="btn btn-info">Ver</a></td>
+                            </tr>
+                        `);
+                    });
+                    $('#tabla-completados').show(); // Muestra la tabla
+                } else {
+                    $('#loading-completados').html('No tienes cursos completados.').show();
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error("Error al cargar cursos completados:", textStatus, errorThrown, jqXHR.responseText);
+                $('#loading-completados').html('<div class="alert alert-danger">Error al cargar los cursos completados. Revisa la consola.</div>').show();
+            }
+        });
+    }
+    
+    if ($('#tabla-asignados').length > 0 && $('#tabla-completados').length > 0) {
+        cargarCursosAsignados();
+        cargarCursosCompletados();
+    }
     // Función para validar el formulario
     function validarFormulario() {
         const preguntas = document.querySelectorAll('form .mb-3');

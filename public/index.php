@@ -75,7 +75,7 @@ $app->group('/api/alumnos', function ($group) {
     $group->get('/cursos/asignados', AlumnoController::class . ':getCursosAsignados');
     $group->get('/cursos/completados', AlumnoController::class . ':getCursosCompletados');
     $group->get('/clases', AlumnoController::class . ':getMisClases');
-    $group->post('/clases/unirse', AlumnoController::class . ':unirseAClase');
+    //$group->post('/clases/unirse', AlumnoController::class . ':unirseAClase');
 
 });
 

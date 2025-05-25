@@ -228,6 +228,203 @@ class ClaseModel {
     }
 
     /**
+     * Actualiza los datos básicos de una clase
+     */
+    public function actualizarClase($clase_id, $nombre, $descripcion = null) {
+        $sql = "UPDATE clases SET nombre = :nombre, descripcion = :descripcion WHERE id = :clase_id";
+        $stmt = $this->db->prepare($sql);
+        
+        return $stmt->execute([
+            ':nombre' => $nombre,
+            ':descripcion' => $descripcion,
+            ':clase_id' => $clase_id
+        ]);
+    }
+
+    /**
+     * Agrega nuevos cursos a una clase existente
+     */
+    public function agregarCursosAClase($clase_id, $nuevos_cursos) {
+        if (empty($nuevos_cursos)) return true;
+        
+        $this->db->beginTransaction();
+        
+        try {
+            // Insertar nuevos cursos en clasecurso
+            $sql = "INSERT IGNORE INTO clasecurso (clase_id, curso_id) VALUES (:clase_id, :curso_id)";
+            $stmt = $this->db->prepare($sql);
+            
+            foreach ($nuevos_cursos as $curso_id) {
+                $stmt->execute([
+                    ':clase_id' => $clase_id,
+                    ':curso_id' => $curso_id
+                ]);
+            }
+            
+            // Crear relaciones alumno-curso para los nuevos cursos
+            $this->crearRelacionesAlumnoCurso($clase_id, $nuevos_cursos);
+            
+            $this->db->commit();
+            return true;
+            
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Agrega nuevos alumnos a una clase existente
+     */
+    public function agregarAlumnosAClase($clase_id, $nuevos_alumnos) {
+        if (empty($nuevos_alumnos)) return true;
+        
+        $this->db->beginTransaction();
+        
+        try {
+            // Insertar nuevos alumnos en alumnoclase
+            $sql = "INSERT IGNORE INTO alumnoclase (alumno_id, clase_id) VALUES (:alumno_id, :clase_id)";
+            $stmt = $this->db->prepare($sql);
+            
+            foreach ($nuevos_alumnos as $alumno_id) {
+                $stmt->execute([
+                    ':alumno_id' => $alumno_id,
+                    ':clase_id' => $clase_id
+                ]);
+            }
+            
+            // Obtener cursos existentes de la clase y asignarlos a los nuevos alumnos
+            $cursos = $this->obtenerCursosDeLaClase($clase_id);
+            if (!empty($cursos)) {
+                $this->crearRelacionesAlumnoCurso($clase_id, array_column($cursos, 'id'), $nuevos_alumnos);
+            }
+            
+            $this->db->commit();
+            return true;
+            
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Elimina cursos de una clase
+     */
+    public function eliminarCursosDeClase($clase_id, $cursos_a_eliminar) {
+        if (empty($cursos_a_eliminar)) return true;
+        
+        $this->db->beginTransaction();
+        
+        try {
+            // Eliminar de clasecurso
+            $sql = "DELETE FROM clasecurso WHERE clase_id = :clase_id AND curso_id = :curso_id";
+            $stmt = $this->db->prepare($sql);
+            
+            foreach ($cursos_a_eliminar as $curso_id) {
+                $stmt->execute([
+                    ':clase_id' => $clase_id,
+                    ':curso_id' => $curso_id
+                ]);
+            }
+            
+            // Eliminar de alumnocurso
+            $sql = "DELETE FROM alumnocurso WHERE clase_id = :clase_id AND curso_id = :curso_id";
+            $stmt = $this->db->prepare($sql);
+            
+            foreach ($cursos_a_eliminar as $curso_id) {
+                $stmt->execute([
+                    ':clase_id' => $clase_id,
+                    ':curso_id' => $curso_id
+                ]);
+            }
+            
+            $this->db->commit();
+            return true;
+            
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Elimina alumnos de una clase
+     */
+    public function eliminarAlumnosDeClase($clase_id, $alumnos_a_eliminar) {
+        if (empty($alumnos_a_eliminar)) return true;
+        
+        $this->db->beginTransaction();
+        
+        try {
+            // Eliminar de alumnoclase
+            $sql = "DELETE FROM alumnoclase WHERE clase_id = :clase_id AND alumno_id = :alumno_id";
+            $stmt = $this->db->prepare($sql);
+            
+            foreach ($alumnos_a_eliminar as $alumno_id) {
+                $stmt->execute([
+                    ':clase_id' => $clase_id,
+                    ':alumno_id' => $alumno_id
+                ]);
+            }
+            
+            // Eliminar de alumnocurso
+            $sql = "DELETE FROM alumnocurso WHERE clase_id = :clase_id AND alumno_id = :alumno_id";
+            $stmt = $this->db->prepare($sql);
+            
+            foreach ($alumnos_a_eliminar as $alumno_id) {
+                $stmt->execute([
+                    ':clase_id' => $clase_id,
+                    ':alumno_id' => $alumno_id
+                ]);
+            }
+            
+            $this->db->commit();
+            return true;
+            
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Obtiene cursos disponibles que NO están en la clase
+     */
+    public function obtenerCursosDisponibles($clase_id) {
+        $sql = "SELECT c.id, c.titulo, c.descripcion, cat.nombre as categoria_nombre
+                FROM cursos c
+                LEFT JOIN categoriascurso cat ON c.categoria_id = cat.id
+                WHERE c.id NOT IN (
+                    SELECT curso_id FROM clasecurso WHERE clase_id = :clase_id AND estado = 'activo'
+                )
+                ORDER BY cat.nombre ASC, c.titulo ASC";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':clase_id' => $clase_id]);
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Obtiene alumnos disponibles que NO están en la clase
+     */
+    public function obtenerAlumnosDisponibles($clase_id) {
+        $sql = "SELECT a.id, a.nombre, u.email
+                FROM alumno a
+                JOIN usuarios u ON a.usuario_id = u.id
+                WHERE u.estado = 1 AND a.id NOT IN (
+                    SELECT alumno_id FROM alumnoclase WHERE clase_id = :clase_id AND estado = 'activo'
+                )
+                ORDER BY a.nombre ASC";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':clase_id' => $clase_id]);
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
      * Crea las relaciones automáticas en la tabla alumnocurso
      */
     private function crearRelacionesAlumnoCurso($clase_id, $cursos, $alumnos_especificos = null) {

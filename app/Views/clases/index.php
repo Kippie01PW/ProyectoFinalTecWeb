@@ -145,36 +145,26 @@
                                         <code><?= htmlspecialchars($clase['codigo']) ?></code>
                                         <button class="btn btn-sm btn-outline-secondary ms-1" 
                                                 onclick="copiarCodigo('<?= $clase['codigo'] ?>')">
-                                            📋
+                                                copiar
                                         </button>
                                     </td>
                                     <td><?= htmlspecialchars($clase['descripcion'] ?? 'Sin descripción') ?></td>
                                     <td>
                                         <span class="badge bg-primary"><?= $clase['total_alumnos'] ?></span>
-                                        <?php if (!empty($clase['alumnos'])): ?>
-                                            <br><small class="text-muted">
-                                                <?php foreach ($clase['alumnos'] as $alumno): ?>
-                                                    • <?= htmlspecialchars($alumno['nombre']) ?><br>
-                                                <?php endforeach; ?>
-                                            </small>
-                                        <?php endif; ?>
                                     </td>
                                     <td>
                                         <span class="badge bg-success"><?= $clase['total_cursos'] ?></span>
-                                        <?php if (!empty($clase['cursos'])): ?>
-                                            <br><small class="text-muted">
-                                                <?php foreach ($clase['cursos'] as $curso): ?>
-                                                    • <?= htmlspecialchars($curso['titulo']) ?><br>
-                                                <?php endforeach; ?>
-                                            </small>
-                                        <?php endif; ?>
                                     </td>
                                     <td><?= date('d/m/Y', strtotime($clase['created_at'])) ?></td>
                                     <td>
-                                        <button class="btn btn-sm btn-info" 
-                                                onclick="verDetalles(<?= $clase['id'] ?>)">
-                                            Ver
+                                        <button class="btn btn-sm btn-info me-1" 
+                                                onclick="verDetalles(<?= $clase['id'] ?>, '<?= htmlspecialchars($clase['nombre']) ?>')">
+                                                Ver
                                         </button>
+                                        <a href="/ProyectoFinalTecWeb/public/clases/editar/<?= $clase['id'] ?>" 
+                                           class="btn btn-sm btn-warning">
+                                           Editar
+                                        </a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -182,6 +172,31 @@
                     </table>
                 </div>
             <?php endif; ?>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para mostrar detalles de la clase -->
+<div class="modal fade" id="modalDetalles" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitulo">Detalles de la Clase</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="contenidoModal">
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        <p>Cargando detalles...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
         </div>
     </div>
 </div>
@@ -254,7 +269,7 @@ document.getElementById('formClase').addEventListener('submit', function(e) {
     const nombre = document.getElementById('nombre').value.trim();
     if (!nombre) {
         document.getElementById('mensaje').innerHTML = 
-            '<div class="alert alert-warning">⚠️ El nombre de la clase es obligatorio</div>';
+            '<div class="alert alert-warning">El nombre de la clase es obligatorio</div>';
         return;
     }
     
@@ -271,7 +286,7 @@ document.getElementById('formClase').addEventListener('submit', function(e) {
     
     // Mostrar mensaje de carga
     document.getElementById('mensaje').innerHTML = 
-        '<div class="alert alert-info">⏳ Creando clase...</div>';
+        '<div class="alert alert-info">Creando clase...</div>';
     
     fetch('/ProyectoFinalTecWeb/public/api/clases/crear', {
         method: 'POST',
@@ -283,11 +298,11 @@ document.getElementById('formClase').addEventListener('submit', function(e) {
         if (data.success) {
             mensaje.innerHTML = `
                 <div class="alert alert-success">
-                    ✅ <strong>Clase creada exitosamente!</strong>
-                    <br>📋 <strong>Código de la clase: ${data.codigo}</strong>
-                    <br>📚 <strong>${data.cursos_asignados || 0} cursos asignados</strong>
-                    <br>👥 <strong>${data.alumnos_asignados || 0} alumnos inscritos</strong>
-                    <br>🔗 <strong>${data.relaciones_creadas || 0} relaciones alumno-curso creadas</strong>
+                    <strong>Clase creada exitosamente!</strong>
+                    <br>Código de la clase: <strong>${data.codigo}</strong>
+                    <br>Cursos asignados: <strong>${data.cursos_asignados || 0}</strong>
+                    <br>Alumnos inscritos: <strong>${data.alumnos_asignados || 0}</strong>
+                    <br>Relaciones alumno-curso creadas: <strong>${data.relaciones_creadas || 0}</strong>
                     <br><small class="text-muted">¡La tabla alumnocurso se llenó automáticamente!</small>
                 </div>
             `;
@@ -298,12 +313,12 @@ document.getElementById('formClase').addEventListener('submit', function(e) {
                 location.reload();
             }, 3000);
         } else {
-            mensaje.innerHTML = `<div class="alert alert-danger">❌ ${data.error}</div>`;
+            mensaje.innerHTML = `<div class="alert alert-danger">Error: ${data.error}</div>`;
         }
     })
     .catch(error => {
         document.getElementById('mensaje').innerHTML = 
-            `<div class="alert alert-danger">❌ Error: ${error.message}</div>`;
+            `<div class="alert alert-danger">Error: ${error.message}</div>`;
     });
 });
 
@@ -314,7 +329,7 @@ function copiarCodigo(codigo) {
         const toast = document.createElement('div');
         toast.className = 'alert alert-success position-fixed';
         toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 250px;';
-        toast.innerHTML = `✅ Código copiado: <strong>${codigo}</strong>`;
+        toast.innerHTML = `Código copiado: <strong>${codigo}</strong>`;
         document.body.appendChild(toast);
         
         // Remover después de 2 segundos
@@ -327,9 +342,121 @@ function copiarCodigo(codigo) {
     });
 }
 
-// Función para ver detalles (placeholder)
-function verDetalles(claseId) {
-    alert('Función de ver detalles de clase ID: ' + claseId + ' - Por implementar');
+// Función para ver detalles de la clase
+function verDetalles(claseId, nombreClase) {
+    const modal = new bootstrap.Modal(document.getElementById('modalDetalles'));
+    document.getElementById('modalTitulo').textContent = `Detalles de: ${nombreClase}`;
+    
+    // Mostrar modal con loading
+    modal.show();
+    
+    // Debug: mostrar la URL que se está llamando
+    const url = `/ProyectoFinalTecWeb/public/api/clases/detalles/${claseId}`;
+    console.log('Llamando a URL:', url);
+    
+    // Cargar detalles via AJAX
+    fetch(url)
+        .then(response => {
+            console.log('Response status:', response.status);
+            console.log('Response ok:', response.ok);
+            
+            // Si la respuesta no es OK, mostrar el error
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            return response.json();
+        })
+        .then(data => {
+            console.log('Datos recibidos:', data);
+            
+            let contenido = '';
+            
+            if (data.error) {
+                contenido = `<div class="alert alert-danger">Error: ${data.error}</div>`;
+            } else {
+                contenido = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Alumnos Inscritos (${data.alumnos.length})</h6>
+                            ${data.alumnos.length > 0 ? `
+                                <div class="list-group mb-3">
+                                    ${data.alumnos.map(alumno => `
+                                        <div class="list-group-item">
+                                            <strong>${alumno.nombre}</strong>
+                                            <br><small class="text-muted">${alumno.email}</small>
+                                            <br><small class="text-info">Inscrito: ${new Date(alumno.fecha_inscripcion).toLocaleDateString()}</small>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : '<p class="text-muted">No hay alumnos inscritos</p>'}
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-success">Cursos Asignados (${data.cursos.length})</h6>
+                            ${data.cursos.length > 0 ? `
+                                <div class="list-group mb-3">
+                                    ${data.cursos.map(curso => `
+                                        <div class="list-group-item">
+                                            <strong>${curso.titulo}</strong>
+                                            ${curso.categoria_nombre ? `<br><small class="text-muted">Categoría: ${curso.categoria_nombre}</small>` : ''}
+                                            ${curso.descripcion ? `<br><small>${curso.descripcion}</small>` : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : '<p class="text-muted">No hay cursos asignados</p>'}
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary">${data.estadisticas.total_alumnos}</h5>
+                                    <p class="card-text">Total Alumnos</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="card-title text-success">${data.estadisticas.total_cursos}</h5>
+                                    <p class="card-text">Total Cursos</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="card-title text-warning">${data.estadisticas.total_asignaciones}</h5>
+                                    <p class="card-text">Asignaciones</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="card-title text-info">${data.estadisticas.cursos_completados}</h5>
+                                    <p class="card-text">Completados</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('contenidoModal').innerHTML = contenido;
+        })
+        .catch(error => {
+            console.error('Error completo:', error);
+            document.getElementById('contenidoModal').innerHTML = 
+                `<div class="alert alert-danger">
+                    <strong>Error al cargar los detalles:</strong><br>
+                    ${error.message}<br><br>
+                    <small>Revisa la consola del navegador (F12) para más detalles</small>
+                </div>`;
+        });
 }
 </script>
 

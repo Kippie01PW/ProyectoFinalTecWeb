@@ -7,8 +7,11 @@ require_once __DIR__ . '/../Controllers/MaestroController.php';
 
 use App\Controllers\MaestroController;
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 $maestro_id = $_SESSION['user_id'] ?? 4;
+
 
 $dashboard = new Data_Maestro($maestro_id);
 

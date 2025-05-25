@@ -1,7 +1,3 @@
-<?php 
-    include __DIR__ . '/layouts/header_maestro.php';
-?>
-
 <?php
 // Las variables $categorias, $error, $success vienen del controlador
 // Verificar que están definidas
@@ -19,17 +15,12 @@ if (!isset($success)) {
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <?php include __DIR__ . '/layouts/header_maestro.php';?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agregar Curso</title>
+    <link rel="stylesheet" href="/ProyectoFinalTecWeb/public/assets/css/style.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
         .form-container {
             background: white;
             padding: 30px;
@@ -123,22 +114,6 @@ if (!isset($success)) {
                 <?= htmlspecialchars($error) ?>
             </div>
         <?php endif; ?>
-
-        <!-- Debug: Mostrar información sobre las categorías -->
-        <?php /*
-        if (isset($categorias)): ?>
-            <div class="debug-info">
-            <strong>Debug:</strong> Se encontraron <?= count($categorias) ?> categorías.
-            <?php if (empty($categorias)): ?>
-                <br><em>No se encontraron categorías en la base de datos. Verifica la tabla 'categoriascurso'.</em>
-            <?php endif; ?>
-            </div>
-        <?php else: ?>
-            <div class="debug-info">
-            <strong>Debug:</strong> Variable $categorias no está definida.
-            </div>
-        <?php endif;
-        */ ?>
 
         <form action="/ProyectoFinalTecWeb/public/cursos/guardar" method="POST" id="cursoForm">
             
@@ -261,9 +236,6 @@ if (!isset($success)) {
             });
         });
     </script>
-    
 </body>
 </html>
-<?php 
-    include __DIR__ . '/layouts/footer.php'; 
-    ?>
+<?php include __DIR__ . '/layouts/footer.php';  ?>

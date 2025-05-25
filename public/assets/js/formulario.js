@@ -101,17 +101,19 @@ $(document).ready(function() {
             dataType: "json",
             data: { respuestas: todasLasRespuestas },
             success: function(data) {
-                 if (data.success) {
-                    // Guardar mensaje primero para que esté disponible en dashboard
-                    sessionStorage.setItem('mensajeDashboard', 'Hemos registrado tus respuestas correctamente :)');
-                    sessionStorage.removeItem('preferenciasFormulario');
+            if (data.success) {
 
-                    // Luego redirigir
-                    window.location.href = baseUrl + "/alumnos/dashboard";
-                }  else {
-                    alert("Error al guardar las preferencias: " + (data.error || 'Error desconocido'));
+                $('#mensajeEnvio').removeClass('d-none').text('Hemos registrado tus respuestas correctamente :). Te recomendamos contestar el formulario solo una vez pero puedes volver a responderlo.');
+
+                $(window).scrollTop($('#mensajeEnvio').offset().top - 20);
+
+                sessionStorage.removeItem('preferenciasFormulario');
+
+            }else {
+                            alert("Error al guardar las preferencias: " + (data.error || 'Error desconocido'));
                 }
             },
+
             error: function(jqXHR, textStatus, errorThrown) {
                 console.error("Error AJAX:", textStatus, errorThrown);
                 console.error("Respuesta del servidor:", jqXHR.responseText);

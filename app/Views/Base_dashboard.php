@@ -5,9 +5,13 @@ include __DIR__ . '/layouts/header_maestro.php';
 require_once __DIR__ . '/../Models/Data_Maestro.php';
 require_once __DIR__ . '/../Controllers/MaestroController.php';
 
+use App\Controllers\MaestroController;
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 $maestro_id = $_SESSION['user_id'] ?? 4;
+
 
 $dashboard = new Data_Maestro($maestro_id);
 
@@ -19,7 +23,7 @@ $alumnosTerminados = $dashboard->getAlumnosTerminados();
 $maestro = $dashboard->getDatosMaestro();
 $datosProgreso = $dashboard->getDatosProgreso();
 
-$jsHandler = new MaestroController($datosPreguntas, $preguntasTexto, $datosProgreso);
+$jsHandler = new \App\Controllers\MaestroController($datosPreguntas, $preguntasTexto, $datosProgreso);
 ?>
 
 <!DOCTYPE html>
@@ -145,7 +149,7 @@ $jsHandler = new MaestroController($datosPreguntas, $preguntasTexto, $datosProgr
                 <!-- Panel de información adicional -->
                 <div class="col-md-7">
                     <div class="card mb-4 mt-4">
-                        <div class="card-body">
+                        <div class="card-body" style="padding-bottom: 17px;">
                             <i class="bi bi-info-circle fs-1"></i>
                             <div class="card-body">
                                 <h5 class="card-title">Información del Dashboard</h5>
@@ -155,7 +159,7 @@ $jsHandler = new MaestroController($datosPreguntas, $preguntasTexto, $datosProgr
                                     del formulario de preferencias de aprendizaje.
                                 </p>
                                 <div class="row">
-                                    <div class="col-6">
+                                    <div class="col-6 mt-3">
                                         <small class="text-muted">
                                             <strong>Tipos de gráfico disponibles:</strong><br>
                                             • Barras<br>
@@ -164,12 +168,11 @@ $jsHandler = new MaestroController($datosPreguntas, $preguntasTexto, $datosProgr
                                             • Circular
                                         </small>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-6 mt-3">
                                         <small class="text-muted">
                                             <strong>Datos disponibles:</strong><br>
                                             • Respuestas del formulario<br>
                                             • Progreso de alumnos<br>
-                                            • Estadísticas generales
                                         </small>
                                     </div>
                                 </div>

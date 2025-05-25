@@ -1,10 +1,8 @@
 $(document).ready(function() {
-    // Cargar cursos al iniciar la página
     cargarCursosAsignados();
     cargarCursosCompletados();
 });
 
-// Función para cargar cursos asignados
 function cargarCursosAsignados() {
     $.ajax({
         url: '/ProyectoFinalTecWeb/public/api/alumnos/cursos/mostrar/asignados',
@@ -29,7 +27,6 @@ function cargarCursosAsignados() {
     });
 }
 
-// Función para cargar cursos completados
 function cargarCursosCompletados() {
     $.ajax({
         url: '/ProyectoFinalTecWeb/public/api/alumnos/cursos/mostrar/completados',
@@ -54,7 +51,6 @@ function cargarCursosCompletados() {
     });
 }
 
-// Función para mostrar cursos asignados en la tabla
 function mostrarCursosAsignados(cursos) {
     const tbody = $('#tabla-asignados tbody');
     tbody.empty();
@@ -71,13 +67,17 @@ function mostrarCursosAsignados(cursos) {
                         '<span class="text-muted">Sin enlace</span>'
                     }
                 </td>
+                <td>
+                    <button onclick="mostrarModalEvidencia(${curso.asignacion_id})" class="btn-success">
+                        Enviar Evidencia
+                    </button>
+                </td>
             </tr>
         `;
         tbody.append(fila);
     });
 }
 
-// Función para mostrar cursos completados en la tabla
 function mostrarCursosCompletados(cursos) {
     const tbody = $('#tabla-completados tbody');
     tbody.empty();
@@ -99,4 +99,74 @@ function mostrarCursosCompletados(cursos) {
         `;
         tbody.append(fila);
     });
+}
+
+function mostrarModalEvidencia(asignacionId) {
+    const modal = `
+        <div id="modal-evidencia" class="modal-overlay">
+            <div class="modal-content">
+                <h3>Subir Evidencia</h3>
+                <form id="form-evidencia" enctype="multipart/form-data">
+                    <input type="hidden" id="asignacion_id" value="${asignacionId}">
+                    <div class="form-group">
+                        <label for="evidencia">Seleccionar imagen:</label>
+                        <input type="file" id="evidencia" name="evidencia" accept="image/*" required>
+                        <small>Solo se permiten archivos de imagen (JPEG, PNG, GIF, WebP)</small>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit" class="btn-primary">Subir Evidencia</button>
+                        <button type="button" onclick="cerrarModal()" class="btn-secondary">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    
+    $('body').append(modal);
+    
+    $('#form-evidencia').on('submit', function(e) {
+        e.preventDefault();
+        subirEvidencia();
+    });
+}
+
+function subirEvidencia() {
+    const formData = new FormData();
+    const fileInput = document.getElementById('evidencia');
+    const asignacionId = document.getElementById('asignacion_id').value;
+    
+    if (!fileInput.files[0]) {
+        alert('Por favor selecciona una imagen');
+        return;
+    }
+    
+    formData.append('evidencia', fileInput.files[0]);
+    formData.append('asignacion_id', asignacionId);
+    
+    $.ajax({
+        url: '/ProyectoFinalTecWeb/public/api/alumnos/cursos/evidencia',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            if (response.success) {
+                alert('Evidencia subida correctamente. El curso ha sido marcado como completado.');
+                cerrarModal();
+                // Recargar ambas tablas
+                cargarCursosAsignados();
+                cargarCursosCompletados();
+            } else {
+                alert('Error: ' + response.error);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al subir evidencia:', error);
+            alert('Error al subir la evidencia');
+        }
+    });
+}
+
+function cerrarModal() {
+    $('#modal-evidencia').remove();
 }

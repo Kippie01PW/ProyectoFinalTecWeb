@@ -58,7 +58,7 @@ function realizarActualizacion(tipo, valor) {
         }
     });
 
-    fetch('../app/Controllers/Maestro_actu.php', {
+    fetch('/ProyectoFinalTecWeb/app/Controllers/Maestro_actu.php', {
         method: 'POST',
         body: formData
     })

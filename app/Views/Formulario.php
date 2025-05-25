@@ -41,13 +41,15 @@ $questions = [
 ];
 
 $preguntasMultiples = [
-  1 => [1, 4],
-  2 => [1, 3],
-  3 => [3],
+  1 => [1, 4], 
+  2 => [1,3],   
+  3 => [3], 
 ];
+
 
 $currentSection = $questions[$page];
 ?>
+
 
 <!DOCTYPE html>
 <html>
@@ -55,41 +57,35 @@ $currentSection = $questions[$page];
   <?php include __DIR__ . '/../Views/layouts/header_alumnos.php'; ?>
   <title>Formulario de Intereses</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="/PROYECTOFINALTECWEB/public/assets/js/formulario.js"></script> 
 </head>
 <body>
 <div class="container mt-4">
-  <h2><?= htmlspecialchars($currentSection['title']) ?></h2>
-  <form method="post" action="<?= $page < $totalPages ? '?page=' . ($page + 1) : 'resultado.php' ?>"
-        onsubmit="return validarFormulario(<?= $page ?>)">
-    
+  <h2><?= $currentSection['title'] ?></h2>
+  <form method="post" action="<?= $page < $totalPages ? '?page=' . ($page + 1) : 'resultado.php' ?>">
     <?php $index = 1; foreach ($currentSection['questions'] as $question => $options): ?>
-      <?php $isMultiple = isset($preguntasMultiples[$page]) && in_array($index, $preguntasMultiples[$page]); ?>
+        <?php $isMultiple = isset($preguntasMultiples[$page]) && in_array($index, $preguntasMultiples[$page]);?>
       <div class="mb-3">
-        <label class="form-label"><strong><?= htmlspecialchars($question) ?></strong></label>
+        <label class="form-label"><strong><?= $question ?></strong></label>
 
+        
         <?php if ($isMultiple): ?>
-          <p class="text-success"><small>Puedes seleccionar más de una opción.</small></p>
+        <p class="text-info"><small>Puedes seleccionar más de una opción.</small></p>
         <?php endif; ?>
 
         <?php foreach ($options as $key => $option): ?>
           <div class="form-check">
             <input class="form-check-input"
-                    type="<?= $isMultiple ? 'checkbox' : 'radio' ?>"
-                    name="q<?= $page ?>_<?= $index ?><?= $isMultiple ? '[]' : '' ?>"
-                    value="<?= chr(97 + $key) ?>">
-
-            <label class="form-check-label"><?= chr(97 + $key) ?>) <?= htmlspecialchars($option) ?></label>
+                  type="<?= $isMultiple ? 'checkbox' : 'radio' ?>"
+                  name="q<?= $page ?>_<?= $index ?><?= $isMultiple ? '[]' : '' ?>"
+                  value="<?= chr(97 + $key) ?>"
+                  <?= $isMultiple ? '' : 'required' ?>>
+            <label class="form-check-label">a) <?= $option ?></label>
           </div>
         <?php endforeach; ?>
       </div>
-    <?php $index++; endforeach; ?>
-
+      <?php $index++; endforeach; ?>
     <button type="submit" class="btn btn-primary"><?= $page < $totalPages ? 'Siguiente' : 'Enviar' ?></button>
   </form>
 </div>
 </body>
-<footer>
-  <?php include __DIR__ . '/../Views/layouts/footer.php'; ?>
-</footer>
 </html>

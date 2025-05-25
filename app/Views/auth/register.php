@@ -41,7 +41,11 @@
                             </select>
                         </div>
                         
-                        <button type="submit" class="btn btn-registro w-100 text-white">Crear cuenta</button>
+                         <div class="d-flex justify-content-between gap-3 mt-4">
+                            <a href="/PROYECTOFINALTECWEB/?action=home" 
+                                class="btn btn-regresar text-white flex-grow-1">Regresar</a>
+                            <button type="submit" class="btn btn-registro text-white flex-grow-1"> Crear cuenta </button>
+                        </div>
                     </form>
                     
                     <div class="text-center mt-4">

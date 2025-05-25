@@ -5,7 +5,7 @@ $(document).ready(function() {
 
         $.ajax({
             type: "POST",
-            url: "/PROYECTOFINALTECWEB/?action=auth/login",
+            url: "/ProyectoFinalTecWeb/public/api/auth/login",
             data: $(this).serialize(),
             dataType: "json",
             success: function(response) {

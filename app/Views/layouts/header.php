@@ -27,14 +27,14 @@
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item me-3">
-                        <a class="nav-link" href="/PROYECTOFINALTECWEB/?action=auth/login">
+                        <a class="nav-link" href="login">
                             <i class="bi bi-box-arrow-in-right me-1"></i>
                             Iniciar Sesión
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link btn btn-outline-light" 
-                           href="/PROYECTOFINALTECWEB/?action=auth/register">
+                           href="register">
                             Registrarse
                         </a>
                     </li>

@@ -28,14 +28,18 @@
                             <input type="password" name="password" class="form-control border-success" required>
                         </div>
                         
-                        <button type="submit" class="btn btn-login w-100 text-black">Ingresar</button>
+                        <div class="d-flex justify-content-between gap-3 mt-4">
+                            <a href="/PROYECTOFINALTECWEB/?action=home" 
+                                class="btn btn-regresar text-white flex-grow-1">Regresar</a>
+                            <button type="submit" class="btn btn-login text-white flex-grow-1">Ingresar</button>
+                        </div>
                     </form>
                     
                     <div class="text-center mt-4">
                         <p class="text-dark">¿No tienes cuenta? 
-                            <a href="/PROYECTOFINALTECWEB/?action=auth/register" class="text-decoration-none text-azul-logo">
-                                Regístrate aquí
-                            </a>
+                        <a href="/ProyectoFinalTecWeb/public/register" class="text-decoration-none text-azul-logo">
+                            Regístrate aquí
+                        </a>
                         </p>
                     </div>
                     

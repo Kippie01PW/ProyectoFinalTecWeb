@@ -22,7 +22,7 @@ class UsuarioModel {
             ':role' => $role
         ]) ? $this->db->lastInsertId() : false;
     }
-
+    
     public function getUserByEmail($email) {
         $sql = "SELECT * FROM usuarios WHERE email = :email LIMIT 1";
         $stmt = $this->db->prepare($sql);

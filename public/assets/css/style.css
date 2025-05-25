@@ -83,14 +83,16 @@ body.register {
 
     :root {
         --verde-primario: #4CAF50;
-        --verde-titulo-encabezado: #3c7cdb;    
+        --azul-titulo-encabezado: #26b1a3;    
         --naranja-logo: #FF6B35;      
         --azul-logo: #004E89;         
         --texto-oscuro: #2D2D2D;  
         --azul-fondo: #51e7c9; 
         --amarillo-fondo: #f3ed45;   
         --verde-hover: #428805;  
-        --rojo-registro:#ed5f5f; 
+        --rojo-regresar:#ed5f5f; 
+        --amarillo-ingresar: #5597ee; 
+        --rojo-hover-regresar: #ab1919; 
     }
 
     .card-registro {
@@ -100,7 +102,7 @@ body.register {
     }
 
     .card-header-registro {
-        background: var(--verde-titulo-encabezado);
+        background: var(--azul-titulo-encabezado);
         padding: 1.5rem;
     }
 
@@ -112,7 +114,7 @@ body.register {
     }
 
     .btn-registro {
-        background: var(--rojo-registro);
+        background: var(--amarillo-ingresar);
         border: none;
         padding: 12px;
         font-weight: 600;
@@ -131,4 +133,30 @@ body.register {
 
     .enlace-login:hover {
         color: var(--naranja-logo);
+    }
+
+    .btn-regresar{
+        background: var(--rojo-regresar);
+        border: none;
+        padding: 12px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .btn-regresar:hover {
+        background: var(--rojo-hover-regresar);
+        transform: translateY(-2px);
+    }
+
+    .btn-login{
+        background: var(--amarillo-ingresar);
+        border: none;
+        padding: 12px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .btn-login:hover{
+        background: var(--verde-hover);
+        transform: translateY(-2px);
     }

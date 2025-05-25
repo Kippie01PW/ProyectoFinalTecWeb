@@ -6,7 +6,7 @@
     <title>Mis Cursos</title>
     <link rel="stylesheet" href="../assets/css/style.css">
 
-    <script src="/PROYECTOFINALTECWEB/public/assets/js/alumnos.js"></script>
+    
     
     <style>
         body { 
@@ -343,6 +343,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="/ProyectoFinalTecWeb/public/assets/js/MostrarCursos.js"></script>
+    <script src="/PROYECTOFINALTECWEB/public/assets/js/botonID.js"></script>
 
 </body>
 </html>

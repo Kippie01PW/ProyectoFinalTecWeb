@@ -11,11 +11,11 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use App\Controllers\AlumnoController;
 use App\Controllers\AuthController; 
+use Psr\Http\Server\RequestHandlerInterface;
+////NUEVO
+use App\Controllers\PreferenciasAlumnoController;
 
-// 1. Cargar Autoloader de Composer
 require __DIR__ . '/../vendor/autoload.php';
-
-// 2. Cargar Configuración
 require __DIR__ . '/../app/config/config.php';
 
 
@@ -24,13 +24,38 @@ $app = AppFactory::create();
 
 $app->setBasePath('/ProyectoFinalTecWeb/public'); 
 
-// 5. Añadir Middleware de Ruteo y Errores
+
 $app->addRoutingMiddleware();
-$errorMiddleware = $app->addErrorMiddleware(true, true, true); // true para desarrollo
+$errorMiddleware = $app->addErrorMiddleware(true, true, true); 
 
-// --- 6. Definir Rutas ---
+$requireAuth = function (Request $request, RequestHandlerInterface $handler) {
+    if (session_status() == PHP_SESSION_NONE) { session_start(); }
+    if (!isset($_SESSION['user_id'])) {
+        $response = new \Slim\Psr7\Response();
+        return $response->withHeader('Location', '/ProyectoFinalTecWeb/public/login')->withStatus(302);
+    }
+    return $handler->handle($request);
+};
 
-// Ruta / (Conócenos)
+$requireAlumno = function (Request $request, RequestHandlerInterface $handler) {
+    if ($_SESSION['role'] !== 'alumno') {
+        $response = new \Slim\Psr7\Response();
+        return $response->withHeader('Location', '/ProyectoFinalTecWeb/public/')->withStatus(302);
+    }
+
+    return $handler->handle($request);
+};
+
+$requireMaestro = function (Request $request, RequestHandlerInterface $handler) {
+    if ($_SESSION['role'] !== 'maestro') {
+        $response = new \Slim\Psr7\Response();
+        return $response->withHeader('Location', '/ProyectoFinalTecWeb/public/')->withStatus(302);
+    }
+    return $handler->handle($request);
+};
+
+
+
 $app->get('/', function (Request $request, Response $response, $args) {
     ob_start();
     require APP_ROOT . '/Views/home.php';
@@ -39,23 +64,33 @@ $app->get('/', function (Request $request, Response $response, $args) {
     return $response;
 });
 
-// Rutas para Alumnos (¡Las tuyas!)
+
+
+$app->group('/alumnos', function ($group) {
+    $group->get('/dashboard', \App\Controllers\AlumnoController::class . ':showDashboard');
+    $group->get('/cursos', \App\Controllers\AlumnoController::class . ':showCursosPage');
+    //NUEVO
+    $group->get('/preferencias/formulario', \App\Controllers\PreferenciasAlumnoController::class . ':showFormulario');
+})->add($requireAlumno)->add($requireAuth); 
+
+// Rutas para Alumnos 
 $app->group('/api/alumnos', function ($group) {
     $group->get('/cursos/asignados', AlumnoController::class . ':getCursosAsignados');
     $group->get('/cursos/completados', AlumnoController::class . ':getCursosCompletados');
     $group->get('/clases', AlumnoController::class . ':getMisClases');
     $group->post('/clases/unirse', AlumnoController::class . ':unirseAClase');
+
+    //NUEVO
+    $group->get('/preferencias/formulario', \App\Controllers\PreferenciasAlumnoController::class . ':showFormulario');
 });
 
 // Rutas para Autenticación
 
 $app->get('/register', AuthController::class . ':showRegisterForm'); // <-- ¡NUEVO!
 $app->post('/api/auth/register', \App\Controllers\AuthController::class . ':processRegistration');
-
-// En public/index.php
-
 $app->get('/login', \App\Controllers\AuthController::class . ':showLoginForm');
 $app->post('/api/auth/login', \App\Controllers\AuthController::class . ':processLogin');
+$app->get('/logout', \App\Controllers\AuthController::class . ':logout');
 
 // --- Fin de Rutas ---
 

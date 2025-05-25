@@ -161,4 +161,26 @@ class AlumnoController
                 ->withHeader('Content-Type', 'application/json')
                 ->withStatus($status);
     }
-}
+    
+    /**
+     * Muestra la página HTML principal de cursos para el alumno.
+     */
+    public function showCursosPage(Request $request, Response $response, $args)
+    {
+        ob_start();
+        require_once APP_ROOT . '/Views/layouts/header_alumnos.php'; 
+        require_once APP_ROOT . '/Views/alumnos/cursos.php';       
+        require_once APP_ROOT . '/Views/layouts/footer.php';          
+        $output = ob_get_clean(); 
+        $response->getBody()->write($output); 
+        return $response;
+    }
+    
+    public function showDashboard(Request $request, Response $response, $args) {
+        ob_start();
+        require_once APP_ROOT . '/Views/alumnos/dashboard.php';
+        $output = ob_get_clean();
+        $response->getBody()->write($output);
+        return $response;
+    }
+    }

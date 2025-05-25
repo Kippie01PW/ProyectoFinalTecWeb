@@ -147,8 +147,8 @@ class AuthController {
                 $_SESSION['maestro_id'] = $perfil ? $perfil['id'] : null;
             }
 
-            // Construimos la URL de redirección usando las rutas de Slim
-            $redirectUrl = "/ProyectoFinalTecWeb/public/{$usuario['role']}/dashboard";
+            $rolePath = ($usuario['role'] === 'alumno') ? 'alumnos' : 'maestros'; 
+            $redirectUrl = "/ProyectoFinalTecWeb/public/{$rolePath}/dashboard"; 
 
             $responseData = ['success' => true, 'redirect' => $redirectUrl];
             $status = 200; // 200 OK
@@ -161,6 +161,25 @@ class AuthController {
 
         $response->getBody()->write(json_encode($responseData));
         return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
+    }
+    
+    public function logout(Request $request, Response $response, $args)
+    {
+        // Aseguramos que la sesión esté activa para poder destruirla
+        if (session_status() == PHP_SESSION_NONE) { 
+            session_start(); 
+        }
+        
+        session_unset(); // Libera todas las variables de sesión
+        session_destroy(); // Destruye toda la información de la sesión
+
+        // Construimos la URL base para redirigir
+        $baseUrl = '/ProyectoFinalTecWeb/public/';
+        
+        // Redirige a la página principal (o al login si prefieres)
+        return $response
+                ->withHeader('Location', $baseUrl) // Redirigimos a la raíz
+                ->withStatus(302);
     }
 }
 ?>

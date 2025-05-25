@@ -11,7 +11,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-custom-green py-3">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/alumno/dashboard">
+            <a class="navbar-brand" href="/ProyectoFinalTecWeb/public/alumnos/dashboard">
                 <img src="/PROYECTOFINALTECWEB/public/assets/images/NexoLearn_logo_narvar.png"  
                      class="navbar-logo" 
                      alt="Logo Educación ODS">
@@ -27,7 +27,7 @@
             <div class="collapse navbar-collapse justify-content-end" id="navbarAlumno">
                 <ul class="navbar-nav">
                     <li class="nav-item mx-2">
-                        <a class="nav-link" href="###">
+                        <a class="nav-link" href="/ProyectoFinalTecWeb/public/alumnos/cursos">
                             <i class="bi bi-journal-bookmark me-1"></i>
                             Mis Cursos
                         </a>
@@ -44,6 +44,12 @@
                             Mi Aprendizaje
                         </a>
                     </li>
+                                    <li class="nav-item mx-2">
+                    <a class="nav-link" href="/ProyectoFinalTecWeb/public/alumnos/preferencias/formulario">
+                        <i class="bi bi-mortarboard me-1"></i>
+                        Formulario
+                    </a>
+                </li>
                     <li class="nav-item dropdown mx-2">
                         <a class="nav-link dropdown-toggle" 
                            href="##" 
@@ -53,7 +59,7 @@
                             Perfil
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/auth/logout">Cerrar Sesión</a></li>
+                            <li><a class="dropdown-item" href="/ProyectoFinalTecWeb/public/logout">Cerrar Sesión</a></li>
                         </ul>
                     </li>
                 </ul>

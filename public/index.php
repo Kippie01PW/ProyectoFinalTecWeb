@@ -16,6 +16,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 use App\Controllers\PreferenciasAlumnoController;
 ///Nuevo
 use App\Controllers\CursoController;
+use App\Controllers\ClaseController;
+
 use App\Controllers\MaestroController;
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../app/config/config.php';
@@ -70,16 +72,18 @@ $app->group('/alumnos', function ($group) {
     $group->post('/preferencias/guardar', \App\Controllers\PreferenciasAlumnoController::class . ':guardarPreferencias');
 })->add($requireAlumno)->add($requireAuth); 
 
-// Rutas para Alumnos 
+// Rutas API Alumno 
 $app->group('/api/alumnos', function ($group) {
-    $group->get('/cursos/asignados', AlumnoController::class . ':getCursosAsignados');
-    $group->get('/cursos/completados', AlumnoController::class . ':getCursosCompletados');
-    $group->get('/clases', AlumnoController::class . ':getMisClases');
-    //$group->post('/clases/unirse', AlumnoController::class . ':unirseAClase');
+    $group->get('/cursos/asignados', \App\Controllers\AlumnoController::class . ':getCursosAsignados'); 
+    $group->get('/cursos/completados', \App\Controllers\AlumnoController::class . ':getCursosCompletados');
+    $group->get('/clases', \App\Controllers\AlumnoController::class . ':getMisClases');
+    // $group->post('/clases/unirse', \App\Controllers\AlumnoController::class . ':unirseAClase'); // <-- COMENTAREMOS O ELIMINAREMOS ESTA
 
-});
+    // En la sección de rutas API Alumno, reemplazar las líneas existentes:
+    $group->get('/cursos/mostrar/asignados', \App\Controllers\MostrarCursosController::class . ':getCursosAsignados');
+    $group->get('/cursos/mostrar/completados', \App\Controllers\MostrarCursosController::class . ':getCursosCompletados');
+})->add($requireAlumno)->add($requireAuth); 
 
-// Rutas para Autenticación
 
 $app->get('/register', AuthController::class . ':showRegisterForm'); // <-- ¡NUEVO!
 $app->post('/api/auth/register', \App\Controllers\AuthController::class . ':processRegistration');
@@ -113,8 +117,22 @@ $app->get('/maestros/dashboard', function (Request $request, Response $response,
     return $response;
 })->add($requireMaestro)->add($requireAuth);
 
+// Rutas para Clases (Maestros)
+$app->group('/clases', function ($group) {
+    $group->get('/', \App\Controllers\ClaseController::class . ':showClases');
+    $group->get('/index', \App\Controllers\ClaseController::class . ':showClases');
+    $group->get('/editar/{id}', \App\Controllers\ClaseController::class . ':showEditar');  // ← NUEVA
+    $group->get('/ver/{id}', \App\Controllers\ClaseController::class . ':verClase');
+})->add($requireMaestro)->add($requireAuth);
 
-
+// Rutas API para Clases
+$app->group('/api/clases', function ($group) {
+    $group->post('/crear', \App\Controllers\ClaseController::class . ':crearClase');
+    $group->post('/unirse', \App\Controllers\ClaseController::class . ':unirseClase');
+    $group->get('/estadisticas/{id}', \App\Controllers\ClaseController::class . ':obtenerEstadisticas');
+    $group->get('/detalles/{id}', \App\Controllers\ClaseController::class . ':obtenerDetalles');
+    $group->post('/actualizar/{id}', \App\Controllers\ClaseController::class . ':actualizarClase');  // ← NUEVA
+});
 
 // --- Fin de Rutas ---
 

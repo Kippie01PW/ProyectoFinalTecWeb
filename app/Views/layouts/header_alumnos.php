@@ -11,7 +11,7 @@
 <body data-alumno-id="<?php echo htmlspecialchars($_SESSION['alumno_id'] ?? ''); ?>">
     <nav class="navbar navbar-expand-lg navbar-dark bg-custom-green py-3">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/ProyectoFinalTecWeb/public/alumnos/dashboard">
+            <a class="navbar-brand" href="/ProyectoFinalTecWeb/public/alumnos/cursos">
                 <img src="/PROYECTOFINALTECWEB/public/assets/images/NexoLearn_logo_narvar.png"  
                      class="navbar-logo" 
                      alt="Logo Educación ODS">
@@ -32,19 +32,7 @@
                             Mis Cursos
                         </a>
                     </li>
-                    <li class="nav-item mx-2">
-                        <a class="nav-link" href="###">
-                            <i class="bi bi-collection me-1"></i>
-                            Mis Grupos
-                        </a>
-                    </li>
-                    <li class="nav-item mx-2">
-                        <a class="nav-link" href="###">
-                            <i class="bi bi-mortarboard me-1"></i>
-                            Mi Aprendizaje
-                        </a>
-                    </li>
-                                    <li class="nav-item mx-2">
+                <li class="nav-item mx-2">
                     <a class="nav-link" href="/ProyectoFinalTecWeb/public/alumnos/preferencias/formulario">
                         <i class="bi bi-mortarboard me-1"></i>
                         Formulario

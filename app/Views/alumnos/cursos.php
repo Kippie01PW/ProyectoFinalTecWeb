@@ -11,11 +11,11 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: #f8f9fa;
             margin: 0;
-            padding: 20px;
+            padding: 0px;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         
@@ -45,9 +45,16 @@
             border: 1px solid #e9ecef; 
             border-radius: 12px; 
             padding: 25px; 
-            width: 48%; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             min-height: 400px;
+        }
+        
+        .curso-seccion.asignados { 
+            width: 65%; /* Más espacio para cursos asignados */
+        }
+        
+        .curso-seccion.completados { 
+            width: 32%; /* Menos espacio para cursos completados */
         }
         
         table { 
@@ -88,10 +95,31 @@
             text-decoration: none; 
             border-radius: 6px;
             font-size: 14px;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            margin: 2px;
         }
         
         .btn-primary:hover {
             background-color: #0056b3;
+        }
+        
+        .btn-success { 
+            background-color: #28a745; 
+            color: white; 
+            padding: 8px 15px; 
+            text-decoration: none; 
+            border-radius: 6px;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            margin: 2px;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
         }
         
         .btn-info { 
@@ -105,6 +133,21 @@
         
         .btn-info:hover {
             background-color: #117a8b;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 2px;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #545b62;
         }
         
         .alert-danger { 
@@ -130,13 +173,126 @@
             font-style: italic;
         }
         
-        @media (max-width: 768px) {
+        .acciones-btn {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .badge {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        td strong {
+            color: #333;
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-content h3 {
+            margin-top: 0;
+            color: #333;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-group small {
+            color: #6c757d;
+            font-size: 12px;
+            display: block;
+            margin-top: 5px;
+        }
+        
+        .form-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .form-buttons button {
+            flex: 1;
+            padding: 12px;
+        }
+        
+        @media (max-width: 1024px) {
             .cursos-container {
                 flex-direction: column;
             }
             
-            .curso-seccion {
+            .curso-seccion.asignados,
+            .curso-seccion.completados {
                 width: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .curso-seccion {
+                padding: 15px;
+            }
+            
+            th, td {
+                padding: 8px;
+                font-size: 14px;
+            }
+            
+            .acciones-btn {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            
+            .btn-primary, .btn-success {
+                font-size: 12px;
+                padding: 6px 10px;
             }
         }
     </style>
@@ -146,7 +302,7 @@
         <h1>Mis Cursos</h1>
 
         <div class="cursos-container">
-            <div class="curso-seccion">
+            <div class="curso-seccion asignados">
                 <h2>Cursos Asignados</h2>
                 <div id="loading-asignados">Cargando cursos asignados...</div>
                 <table id="tabla-asignados" style="display:none;">
@@ -155,7 +311,9 @@
                             <th>Título</th>
                             <th>Descripción</th>
                             <th>Categoría</th>
-                            <th>Acceso</th>
+                            <th>Clase</th>
+                            <th>Acceso al Curso</th>
+                            <th>Subir Evidencia</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -163,7 +321,7 @@
                 </table>
             </div>
 
-            <div class="curso-seccion">
+            <div class="curso-seccion completados">
                 <h2>Cursos Completados</h2>
                 <div id="loading-completados">Cargando cursos completados...</div>
                 <table id="tabla-completados" style="display:none;">

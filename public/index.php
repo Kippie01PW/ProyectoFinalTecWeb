@@ -12,6 +12,8 @@ use Slim\Factory\AppFactory;
 use App\Controllers\AlumnoController;
 use App\Controllers\AuthController; 
 use Psr\Http\Server\RequestHandlerInterface;
+////NUEVO
+use App\Controllers\PreferenciasAlumnoController;
 
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../app/config/config.php';
@@ -67,6 +69,8 @@ $app->get('/', function (Request $request, Response $response, $args) {
 $app->group('/alumnos', function ($group) {
     $group->get('/dashboard', \App\Controllers\AlumnoController::class . ':showDashboard');
     $group->get('/cursos', \App\Controllers\AlumnoController::class . ':showCursosPage');
+    //NUEVO
+    $group->get('/preferencias/formulario', \App\Controllers\PreferenciasAlumnoController::class . ':showFormulario');
 })->add($requireAlumno)->add($requireAuth); 
 
 // Rutas para Alumnos 
@@ -75,6 +79,9 @@ $app->group('/api/alumnos', function ($group) {
     $group->get('/cursos/completados', AlumnoController::class . ':getCursosCompletados');
     $group->get('/clases', AlumnoController::class . ':getMisClases');
     $group->post('/clases/unirse', AlumnoController::class . ':unirseAClase');
+
+    //NUEVO
+    $group->post('/preferencias/guardar', PreferenciasAlumnoController::class . ':guardarPreferencias');
 });
 
 // Rutas para Autenticación

@@ -27,7 +27,7 @@
             <div class="collapse navbar-collapse justify-content-end" id="navbarAlumno">
                 <ul class="navbar-nav">
                     <li class="nav-item mx-2">
-                        <a class="nav-link" href="###">
+                        <a class="nav-link" href="/ProyectoFinalTecWeb/public/alumnos/cursos">
                             <i class="bi bi-journal-bookmark me-1"></i>
                             Mis Cursos
                         </a>
@@ -53,7 +53,7 @@
                             Perfil
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/auth/logout">Cerrar Sesión</a></li>
+                            <li><a class="dropdown-item" href="/ProyectoFinalTecWeb/public/logout">Cerrar Sesión</a></li>
                         </ul>
                     </li>
                 </ul>

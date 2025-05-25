@@ -27,7 +27,7 @@
             <div class="collapse navbar-collapse justify-content-end" id="navbarMaestro">
                 <ul class="navbar-nav align-items-center">
                     <li class="nav-item mx-2">
-                        <a class="nav-link" href="###">
+                        <a class="nav-link" href="../maestros/dashboard">
                             <i class="bi bi-speedometer2 me-1"></i>
                             Dashboard
                         </a>

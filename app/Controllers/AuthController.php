@@ -148,10 +148,15 @@ class AuthController {
             }
 
             $rolePath = ($usuario['role'] === 'alumno') ? 'alumnos' : 'maestros'; 
-            $redirectUrl = "/ProyectoFinalTecWeb/public/{$rolePath}/dashboard"; 
+            $redirectUrl = ""; 
+            if ($usuario['role'] === 'alumno') {
+                $redirectUrl = "/ProyectoFinalTecWeb/public/alumnos/cursos"; 
+            } elseif ($usuario['role'] === 'maestro') {
+                $redirectUrl = "/ProyectoFinalTecWeb/public/maestros/dashboard"; 
+            }
 
-            $responseData = ['success' => true, 'redirect' => $redirectUrl];
-            $status = 200; // 200 OK
+    $responseData = ['success' => true, 'redirect' => $redirectUrl];
+    $status = 200;
 
         } else {
             // Credenciales incorrectas

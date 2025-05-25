@@ -14,16 +14,13 @@ class Data_Maestro {
         $this->maestro_id = $maestro_id;
     }
 
-    /**
-     * Cuenta las opciones de una pregunta específica del formulario
-     */
     private function contarOpciones($pregunta) {
         $consulta = "SELECT JSON_UNQUOTE(JSON_EXTRACT(pa.$pregunta, '$')) AS opcion
                      FROM preferenciasalumno pa
                      JOIN alumno a ON pa.alumno_id = a.id
                      JOIN alumnocurso ac ON a.id = ac.alumno_id
                      JOIN cursos c ON ac.curso_id = c.id
-                     JOIN clases cl ON c.clase_id = cl.id
+                     JOIN clases cl ON ac.clase_id = cl.id
                      WHERE cl.maestro_id = :maestro_id";
 
         try {
@@ -45,9 +42,6 @@ class Data_Maestro {
         }
     }
 
-    /**
-     * Obtiene los datos de todas las preguntas del formulario
-     */
     public function getDatosPreguntas() {
         return [
             'pregunta1' => $this->contarOpciones('pregunta1'),
@@ -60,9 +54,6 @@ class Data_Maestro {
         ];
     }
 
-    /**
-     * Obtiene los textos de las preguntas
-     */
     public function getPreguntasTexto() {
         return [
             'pregunta1' => '¿Qué área del conocimiento te interesa más?',
@@ -74,16 +65,13 @@ class Data_Maestro {
             'pregunta20' => '¿Qué te motiva más a aprender en un curso?'
         ];
     }
-
-    /**
-     * Obtiene el total de alumnos del maestro
-     */
     public function getTotalAlumnos() {
         $sql = "SELECT COUNT(DISTINCT a.id) AS total_alumnos
                 FROM alumno a
                 JOIN alumnocurso ac ON a.id = ac.alumno_id
                 JOIN cursos c ON ac.curso_id = c.id
-                JOIN clases cl ON c.clase_id = cl.id
+                JOIN clases cl ON ac.clase_id = cl.id
+
                 WHERE cl.maestro_id = :maestro_id";
 
         try {
@@ -96,10 +84,6 @@ class Data_Maestro {
             die("Error en consulta de alumnos: " . $e->getMessage());
         }
     }
-
-    /**
-     * Obtiene el total de cursos
-     */
     public function getTotalCursos() {
         $sql = "SELECT COUNT(*) AS total_cursos FROM cursos";
 
@@ -112,15 +96,12 @@ class Data_Maestro {
             die("Error en consulta de cursos: " . $e->getMessage());
         }
     }
-
-    /**
-     * Obtiene el total de alumnos que terminaron cursos
-     */
     public function getAlumnosTerminados() {
         $sql = "SELECT COUNT(DISTINCT ac.alumno_id) AS alumnos_terminados
                 FROM alumnocurso ac
                 JOIN cursos c ON ac.curso_id = c.id
-                JOIN clases cl ON c.clase_id = cl.id
+                JOIN clases cl ON ac.clase_id = cl.id
+
                 WHERE cl.maestro_id = :maestro_id AND ac.estado = 'completado'";
 
         try {
@@ -134,9 +115,6 @@ class Data_Maestro {
         }
     }
 
-    /**
-     * Obtiene los datos del maestro
-     */
     public function getDatosMaestro() {
         $sql = "SELECT username, email FROM usuarios WHERE id = :maestro_id";
 
@@ -150,14 +128,12 @@ class Data_Maestro {
         }
     }
 
-    /**
-     * Obtiene los datos de progreso de alumnos
-     */
     public function getDatosProgreso() {
         $sql = "SELECT ac.estado, COUNT(*) AS total
                 FROM alumnocurso ac
                 JOIN cursos c ON ac.curso_id = c.id
-                JOIN clases cl ON c.clase_id = cl.id
+                JOIN clases cl ON ac.clase_id = cl.id
+
                 WHERE cl.maestro_id = :maestro_id
                 GROUP BY ac.estado";
 
@@ -179,9 +155,6 @@ class Data_Maestro {
         }
     }
 
-    /**
-     * Cierra la conexión PDO (opcional)
-     */
     public function cerrarConexion() {
         $this->conexion = null;
     }

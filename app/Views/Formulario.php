@@ -69,7 +69,9 @@ $currentSection = $questions[$page];
   </style>
 </head>
 <body>
+
 <div class="container mt-4">
+  <div id="mensajeEnvio" class="alert alert-success d-none" role="alert"></div>
   <!-- Barra de progreso -->
   <div class="progress mb-4">
     <div class="progress-bar" role="progressbar" style="width: <?= ($page / $totalPages) * 100 ?>%" 
@@ -118,3 +120,4 @@ $currentSection = $questions[$page];
 <script src="/ProyectoFinalTecWeb/public/assets/js/formulario.js"></script>
 </body>
 </html>
+<?php include __DIR__ . '/layouts/footer.php';  ?>

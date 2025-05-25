@@ -1,18 +1,20 @@
 <?php 
-// Incluir el header
+
 include __DIR__ . '/layouts/header_maestro.php';
 
-// Incluir las clases
 require_once __DIR__ . '/../Models/Data_Maestro.php';
 require_once __DIR__ . '/../Controllers/MaestroController.php';
 
-// ID del maestro (puedes obtenerlo de la sesión o parámetro)
-$maestro_id = 4;
+use App\Controllers\MaestroController;
 
-// Crear instancia de la clase de consultas (ya no necesita parámetros de conexión)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+$maestro_id = $_SESSION['user_id'] ?? 4;
+
+
 $dashboard = new Data_Maestro($maestro_id);
 
-// Obtener todos los datos necesarios
 $datosPreguntas = $dashboard->getDatosPreguntas();
 $preguntasTexto = $dashboard->getPreguntasTexto();
 $totalAlumnos = $dashboard->getTotalAlumnos();
@@ -21,8 +23,7 @@ $alumnosTerminados = $dashboard->getAlumnosTerminados();
 $maestro = $dashboard->getDatosMaestro();
 $datosProgreso = $dashboard->getDatosProgreso();
 
-// Crear instancia del manejador de JavaScript
-$jsHandler = new MaestroController($datosPreguntas, $preguntasTexto, $datosProgreso);
+$jsHandler = new \App\Controllers\MaestroController($datosPreguntas, $preguntasTexto, $datosProgreso);
 ?>
 
 <!DOCTYPE html>
@@ -35,8 +36,14 @@ $jsHandler = new MaestroController($datosPreguntas, $preguntasTexto, $datosProgr
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
-    <!-- SweetAlert2 para popups más elegantes -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/ProyectoFinalTecWeb/public/assets/js/dashboard_maestro.js"></script>
+
+
+
+
+
 </head>
 <body>
 
@@ -112,7 +119,7 @@ $jsHandler = new MaestroController($datosPreguntas, $preguntasTexto, $datosProgr
                         <div class="card-body">
                             <i class="bi bi-person-circle fs-1"></i>
                             <div class="card-body">
-                                <form id="formularioMaestro" action="actualizar_maestro.php" method="POST">
+                                <form id="formularioMaestro" action="Maestro_actu.php" method="POST">
                                     <input type="hidden" name="maestro_id" value="<?= $maestro_id ?>">
 
                                     <div class="mb-3">
@@ -144,7 +151,7 @@ $jsHandler = new MaestroController($datosPreguntas, $preguntasTexto, $datosProgr
                 <!-- Panel de información adicional -->
                 <div class="col-md-7">
                     <div class="card mb-4 mt-4">
-                        <div class="card-body">
+                        <div class="card-body" style="padding-bottom: 17px;">
                             <i class="bi bi-info-circle fs-1"></i>
                             <div class="card-body">
                                 <h5 class="card-title">Información del Dashboard</h5>
@@ -154,7 +161,7 @@ $jsHandler = new MaestroController($datosPreguntas, $preguntasTexto, $datosProgr
                                     del formulario de preferencias de aprendizaje.
                                 </p>
                                 <div class="row">
-                                    <div class="col-6">
+                                    <div class="col-6 mt-3">
                                         <small class="text-muted">
                                             <strong>Tipos de gráfico disponibles:</strong><br>
                                             • Barras<br>
@@ -163,12 +170,11 @@ $jsHandler = new MaestroController($datosPreguntas, $preguntasTexto, $datosProgr
                                             • Circular
                                         </small>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-6 mt-3">
                                         <small class="text-muted">
                                             <strong>Datos disponibles:</strong><br>
                                             • Respuestas del formulario<br>
                                             • Progreso de alumnos<br>
-                                            • Estadísticas generales
                                         </small>
                                     </div>
                                 </div>
@@ -182,169 +188,17 @@ $jsHandler = new MaestroController($datosPreguntas, $preguntasTexto, $datosProgr
 </div>
 
 <script>
-// Función para manejar las actualizaciones con popup
-function actualizarDato(tipo) {
-    let titulo, mensaje, valor, inputId;
-    
-    if (tipo === 'correo') {
-        titulo = 'Actualizar Correo Electrónico';
-        mensaje = '¿Estás seguro de que deseas actualizar tu correo electrónico?';
-        inputId = 'inputCorreo';
-        valor = document.getElementById(inputId).value;
-        
-        // Validar email
-        if (!validarEmail(valor)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Por favor ingresa un correo electrónico válido'
-            });
-            return;
-        }
-    } else if (tipo === 'contrasena') {
-        titulo = 'Actualizar Contraseña';
-        mensaje = '¿Estás seguro de que deseas actualizar tu contraseña?';
-        inputId = 'inputContrasena';
-        valor = document.getElementById(inputId).value;
-        
-        // Validar contraseña
-        if (valor.length < 6) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'La contraseña debe tener al menos 6 caracteres'
-            });
-            return;
-        }
-    }
-    
-    // Mostrar popup de confirmación
-    Swal.fire({
-        title: titulo,
-        text: mensaje,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, actualizar',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Realizar la actualización
-            realizarActualizacion(tipo, valor);
-        }
-    });
-}
-
-// Función para realizar la actualización vía AJAX
-function realizarActualizacion(tipo, valor) {
-    const formData = new FormData();
-    formData.append('maestro_id', <?= $maestro_id ?>);
-    formData.append('accion', tipo);
-    
-    if (tipo === 'correo') {
-        formData.append('correo', valor);
-    } else if (tipo === 'contrasena') {
-        formData.append('contrasena', valor);
-    }
-    
-    // Mostrar loading
-    Swal.fire({
-        title: 'Actualizando...',
-        text: 'Por favor espera',
-        allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
-    
-    // Realizar petición AJAX
-    fetch('actualizar_maestro.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: '¡Actualizado!',
-                text: data.message || 'Los datos se han actualizado correctamente',
-                timer: 2000,
-                showConfirmButton: false
-            });
-            
-            // Limpiar campo de contraseña si fue actualizada
-            if (tipo === 'contrasena') {
-                document.getElementById('inputContrasena').value = '';
-            }
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: data.message || 'Ocurrió un error al actualizar los datos'
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Ocurrió un error de conexión'
-        });
-    });
-}
-
-// Función para validar email
-function validarEmail(email) {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-}
-
-// También puedes usar Bootstrap Modal si prefieres no usar SweetAlert2
-function mostrarModalBootstrap(tipo) {
-    // Código alternativo usando Bootstrap Modal nativo
-    const modalHtml = `
-        <div class="modal fade" id="modalActualizar" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Confirmar Actualización</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>¿Estás seguro de que deseas actualizar tu ${tipo}?</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-primary" onclick="confirmarActualizacion('${tipo}')">Actualizar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Agregar modal al DOM si no existe
-    if (!document.getElementById('modalActualizar')) {
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-    }
-    
-    // Mostrar modal
-    const modal = new bootstrap.Modal(document.getElementById('modalActualizar'));
-    modal.show();
-}
+    const MAESTRO_ID = <?= json_encode($maestro_id) ?>;
+    window.MAESTRO_ID = MAESTRO_ID;
 </script>
 
-<?php 
-// Generar el JavaScript
-echo $jsHandler->generarJavaScript();
 
-// Cerrar la conexión
+<?php 
+echo $jsHandler->generarJavaScript();
 $dashboard->cerrarConexion();
 ?>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
 

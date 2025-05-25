@@ -16,7 +16,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use App\Controllers\PreferenciasAlumnoController;
 ///Nuevo
 use App\Controllers\CursoController;
-
+use App\Controllers\MaestroController;
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../app/config/config.php';
 
@@ -70,19 +70,14 @@ $app->group('/alumnos', function ($group) {
     $group->post('/preferencias/guardar', \App\Controllers\PreferenciasAlumnoController::class . ':guardarPreferencias');
 })->add($requireAlumno)->add($requireAuth); 
 
-// Rutas para Alumnos 
+// Rutas API Alumno 
 $app->group('/api/alumnos', function ($group) {
-    $group->get('/cursos/asignados', AlumnoController::class . ':getCursosAsignados');
-    $group->get('/cursos/completados', AlumnoController::class . ':getCursosCompletados');
-    $group->get('/clases', AlumnoController::class . ':getMisClases');
-    $group->post('/clases/unirse', AlumnoController::class . ':unirseAClase');
+    $group->get('/cursos/asignados', \App\Controllers\AlumnoController::class . ':getCursosAsignados'); 
+    $group->get('/cursos/completados', \App\Controllers\AlumnoController::class . ':getCursosCompletados');
+    $group->get('/clases', \App\Controllers\AlumnoController::class . ':getMisClases');
+    // $group->post('/clases/unirse', \App\Controllers\AlumnoController::class . ':unirseAClase'); // <-- COMENTAREMOS O ELIMINAREMOS ESTA
+})->add($requireAlumno)->add($requireAuth); 
 
-    //NUEVO
-   // $group->get('/preferencias/formulario', \App\Controllers\PreferenciasAlumnoController::class . ':showFormulario');
-   // $group->post('/preferencias/guardar', \App\Controllers\PreferenciasAlumnoController::class . ':guardarPreferencias');
-});
-
-// Rutas para Autenticación
 
 $app->get('/register', AuthController::class . ':showRegisterForm'); // <-- ¡NUEVO!
 $app->post('/api/auth/register', \App\Controllers\AuthController::class . ':processRegistration');
@@ -103,6 +98,21 @@ $app->group('/cursos', function ($group) {
     // Listar cursos por categoría
     $group->get('/categoria/{id}', CursoController::class . ':listarCursos');
 });
+
+$app->get('/maestros/dashboard', function (Request $request, Response $response, $args) {
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    ob_start();
+    require APP_ROOT . '/Views/Base_dashboard.php'; // Tu archivo actual
+    $output = ob_get_clean();
+    $response->getBody()->write($output);
+    return $response;
+})->add($requireMaestro)->add($requireAuth);
+
+
+
 
 // --- Fin de Rutas ---
 

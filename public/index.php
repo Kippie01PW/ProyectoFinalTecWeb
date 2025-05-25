@@ -39,7 +39,14 @@ $app->get('/', function (Request $request, Response $response, $args) {
     return $response;
 });
 
-// Rutas para Alumnos (¡Las tuyas!)
+
+
+$app->group('/alumnos', function ($group) {
+    $group->get('/dashboard', \App\Controllers\AlumnoController::class . ':showDashboard');
+    $group->get('/cursos', \App\Controllers\AlumnoController::class . ':showCursosPage');
+}); //->add($requireAlumno)->add($requireAuth); 
+
+// Rutas para Alumnos 
 $app->group('/api/alumnos', function ($group) {
     $group->get('/cursos/asignados', AlumnoController::class . ':getCursosAsignados');
     $group->get('/cursos/completados', AlumnoController::class . ':getCursosCompletados');
@@ -51,9 +58,6 @@ $app->group('/api/alumnos', function ($group) {
 
 $app->get('/register', AuthController::class . ':showRegisterForm'); // <-- ¡NUEVO!
 $app->post('/api/auth/register', \App\Controllers\AuthController::class . ':processRegistration');
-
-// En public/index.php
-
 $app->get('/login', \App\Controllers\AuthController::class . ':showLoginForm');
 $app->post('/api/auth/login', \App\Controllers\AuthController::class . ':processLogin');
 

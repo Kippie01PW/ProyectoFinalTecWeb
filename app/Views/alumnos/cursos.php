@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Cursos</title>
     <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/styleMostrarCursos.css">
+
+    <script src="/PROYECTOFINALTECWEB/public/assets/js/alumnos.js"></script>
+    
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -341,6 +343,6 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="/ProyectoFinalTecWeb/public/assets/js/MostrarCursos.js"></script>
-    <script src="/PROYECTOFINALTECWEB/public/assets/js/alumnos.js"></script>
+
 </body>
 </html>

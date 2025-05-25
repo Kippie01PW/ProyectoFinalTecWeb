@@ -1,4 +1,6 @@
 <?php
+namespace App\Controllers;
+
 class MaestroController {
     private $datosPreguntas;
     private $preguntasTexto;
@@ -239,6 +241,16 @@ class MaestroController {
             'datosPreguntas' => $this->datosPreguntas,
             'datosProgreso' => $this->datosProgreso
         ];
+    }
+    public function showPage(Request $request, Response $response, $args)
+    {
+        ob_start();
+        require_once APP_ROOT . '/Views/layouts/header_maestro.php'; 
+        require_once APP_ROOT . '/Views/Base_dashboard.php';       
+        require_once APP_ROOT . '/Views/layouts/footer.php';          
+        $output = ob_get_clean(); 
+        $response->getBody()->write($output); 
+        return $response;
     }
 }
 ?>

@@ -81,8 +81,6 @@ $app->group('/api/alumnos', function ($group) {
    // $group->get('/preferencias/formulario', \App\Controllers\PreferenciasAlumnoController::class . ':showFormulario');
    // $group->post('/preferencias/guardar', \App\Controllers\PreferenciasAlumnoController::class . ':guardarPreferencias');
 
-
-
 });
 
 // Rutas para Autenticación
@@ -94,7 +92,7 @@ $app->post('/api/auth/login', \App\Controllers\AuthController::class . ':process
 $app->get('/logout', \App\Controllers\AuthController::class . ':logout');
 
 ///Nuevo
-// Rutas para Cursos - CORREGIDAS Y ORGANIZADAS
+// Rutas para Cursos 
 
 $app->group('/cursos', function ($group) {
     // Mostrar formulario para crear nuevo curso

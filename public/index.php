@@ -121,6 +121,7 @@ $app->get('/maestros/dashboard', function (Request $request, Response $response,
 $app->group('/clases', function ($group) {
     $group->get('/', \App\Controllers\ClaseController::class . ':showClases');
     $group->get('/index', \App\Controllers\ClaseController::class . ':showClases');
+    $group->get('/editar/{id}', \App\Controllers\ClaseController::class . ':showEditar');  // ← NUEVA
     $group->get('/ver/{id}', \App\Controllers\ClaseController::class . ':verClase');
 })->add($requireMaestro)->add($requireAuth);
 
@@ -129,6 +130,8 @@ $app->group('/api/clases', function ($group) {
     $group->post('/crear', \App\Controllers\ClaseController::class . ':crearClase');
     $group->post('/unirse', \App\Controllers\ClaseController::class . ':unirseClase');
     $group->get('/estadisticas/{id}', \App\Controllers\ClaseController::class . ':obtenerEstadisticas');
+    $group->get('/detalles/{id}', \App\Controllers\ClaseController::class . ':obtenerDetalles');
+    $group->post('/actualizar/{id}', \App\Controllers\ClaseController::class . ':actualizarClase');  // ← NUEVA
 });
 
 // --- Fin de Rutas ---

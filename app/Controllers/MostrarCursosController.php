@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers;
 
 use Psr\Http\Message\ResponseInterface as Response;
@@ -7,14 +8,7 @@ use App\Core\Conexion;
 use App\Models\MostrarCursosModel;
 
 class MostrarCursosController {
-    private $cursoModel;
-
-    public function __construct() {
-        // Usar tu conexión existente
-        $conexion = new Conexion();
-        $this->cursoModel = new MostrarCursosModel($conexion->getConnection());
-    }
-
+    
     public function getCursosAsignados(Request $request, Response $response, $args) {
         // Verificar que el usuario esté autenticado
         if (session_status() == PHP_SESSION_NONE) {
@@ -27,8 +21,13 @@ class MostrarCursosController {
             return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
         }
 
+        // Crear conexión y modelo dentro del método
+        $conexionObj = new Conexion();
+        $conexion = $conexionObj->getConexion();
+        $cursoModel = new MostrarCursosModel($conexion);
+
         // Obtener información del alumno
-        $alumno = $this->cursoModel->getAlumnoByUsuarioId($_SESSION['user_id']);
+        $alumno = $cursoModel->getAlumnoByUsuarioId($_SESSION['user_id']);
         
         if (!$alumno) {
             $payload = json_encode(['error' => 'Alumno no encontrado']);
@@ -39,7 +38,7 @@ class MostrarCursosController {
         $alumno_id = $alumno['id'];
 
         try {
-            $cursos = $this->cursoModel->getCursosAsignados($alumno_id);
+            $cursos = $cursoModel->getCursosAsignados($alumno_id);
             $payload = json_encode([
                 'success' => true,
                 'data' => $cursos
@@ -47,7 +46,7 @@ class MostrarCursosController {
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json');
         } catch (Exception $e) {
-            $payload = json_encode(['error' => 'Error al obtener cursos asignados']);
+            $payload = json_encode(['error' => 'Error al obtener cursos asignados: ' . $e->getMessage()]);
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
@@ -65,8 +64,13 @@ class MostrarCursosController {
             return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
         }
 
+        // Crear conexión y modelo dentro del método
+        $conexionObj = new Conexion();
+        $conexion = $conexionObj->getConexion();
+        $cursoModel = new MostrarCursosModel($conexion);
+
         // Obtener información del alumno
-        $alumno = $this->cursoModel->getAlumnoByUsuarioId($_SESSION['user_id']);
+        $alumno = $cursoModel->getAlumnoByUsuarioId($_SESSION['user_id']);
         
         if (!$alumno) {
             $payload = json_encode(['error' => 'Alumno no encontrado']);
@@ -77,7 +81,7 @@ class MostrarCursosController {
         $alumno_id = $alumno['id'];
 
         try {
-            $cursos = $this->cursoModel->getCursosCompletados($alumno_id);
+            $cursos = $cursoModel->getCursosCompletados($alumno_id);
             $payload = json_encode([
                 'success' => true,
                 'data' => $cursos
@@ -85,10 +89,9 @@ class MostrarCursosController {
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json');
         } catch (Exception $e) {
-            $payload = json_encode(['error' => 'Error al obtener cursos completados']);
+            $payload = json_encode(['error' => 'Error al obtener cursos completados: ' . $e->getMessage()]);
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
     }
 }
-?>

@@ -1,19 +1,20 @@
 <?php
-namespace App\Models;
-use App\Core\Conexion;
 
+namespace App\Models;
+
+use App\Core\Conexion;
 
 class MostrarCursosModel {
     private $conn;
-
-    public function __construct($connection) {
-        $this->conn = $connection;
+    
+    public function __construct($conexion) {
+        $this->conn = $conexion;
     }
-
+    
     // Obtener cursos asignados para un alumno
     public function getCursosAsignados($alumno_id) {
         $query = "SELECT 
-                    ac.id as asignacion_id,
+                     ac.id as asignacion_id,
                     c.id as curso_id,
                     c.titulo,
                     c.descripcion,
@@ -25,22 +26,25 @@ class MostrarCursosModel {
                   INNER JOIN cursos c ON ac.curso_id = c.id
                   INNER JOIN clases cl ON ac.clase_id = cl.id
                   LEFT JOIN categoriascurso cat ON c.categoria_id = cat.id
-                  WHERE ac.alumno_id = ? 
-                  AND ac.estado = 'asignado'
+                  WHERE ac.alumno_id = :alumno_id 
+                   AND ac.estado = 'asignado'
                   ORDER BY ac.fecha_asignacion DESC";
         
-        $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $alumno_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        return $result->fetch_all(MYSQLI_ASSOC);
+        try {
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':alumno_id', $alumno_id, \PDO::PARAM_INT);
+            $stmt->execute();
+            
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            throw new \Exception("Error al obtener cursos asignados: " . $e->getMessage());
+        }
     }
 
     // Obtener cursos completados para un alumno
     public function getCursosCompletados($alumno_id) {
         $query = "SELECT 
-                    ac.id as asignacion_id,
+                     ac.id as asignacion_id,
                     c.id as curso_id,
                     c.titulo,
                     c.descripcion,
@@ -53,27 +57,33 @@ class MostrarCursosModel {
                   INNER JOIN cursos c ON ac.curso_id = c.id
                   INNER JOIN clases cl ON ac.clase_id = cl.id
                   LEFT JOIN categoriascurso cat ON c.categoria_id = cat.id
-                  WHERE ac.alumno_id = ? 
-                  AND ac.estado = 'completado'
+                  WHERE ac.alumno_id = :alumno_id 
+                   AND ac.estado = 'completado'
                   ORDER BY ac.fecha_completado DESC";
         
-        $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $alumno_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        return $result->fetch_all(MYSQLI_ASSOC);
+        try {
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':alumno_id', $alumno_id, \PDO::PARAM_INT);
+            $stmt->execute();
+            
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            throw new \Exception("Error al obtener cursos completados: " . $e->getMessage());
+        }
     }
 
     // Obtener información del alumno por usuario_id
     public function getAlumnoByUsuarioId($usuario_id) {
-        $query = "SELECT id, nombre FROM alumno WHERE usuario_id = ?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $usuario_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        $query = "SELECT id, nombre FROM alumno WHERE usuario_id = :usuario_id";
         
-        return $result->fetch_assoc();
+        try {
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':usuario_id', $usuario_id, \PDO::PARAM_INT);
+            $stmt->execute();
+            
+            return $stmt->fetch(\PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            throw new \Exception("Error al obtener información del alumno: " . $e->getMessage());
+        }
     }
 }
-?>

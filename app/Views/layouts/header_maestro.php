@@ -11,7 +11,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-custom-green py-3">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/ProyectoFinalTecWeb/public/maestros/cursos">
+            <a class="navbar-brand" href="/ProyectoFinalTecWeb/public">
                 <img src="/PROYECTOFINALTECWEB/public/assets/images/NexoLearn_logo_narvar.png"  
                      class="navbar-logo" 
                      alt="Logo Educación ODS">

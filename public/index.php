@@ -14,16 +14,15 @@ use App\Controllers\AuthController;
 use Psr\Http\Server\RequestHandlerInterface;
 ////NUEVO
 use App\Controllers\PreferenciasAlumnoController;
+///Nuevo
+use App\Controllers\CursoController;
 
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../app/config/config.php';
 
-
 $app = AppFactory::create();
 
-
 $app->setBasePath('/ProyectoFinalTecWeb/public'); 
-
 
 $app->addRoutingMiddleware();
 $errorMiddleware = $app->addErrorMiddleware(true, true, true); 
@@ -54,8 +53,6 @@ $requireMaestro = function (Request $request, RequestHandlerInterface $handler) 
     return $handler->handle($request);
 };
 
-
-
 $app->get('/', function (Request $request, Response $response, $args) {
     ob_start();
     require APP_ROOT . '/Views/home.php';
@@ -63,8 +60,6 @@ $app->get('/', function (Request $request, Response $response, $args) {
     $response->getBody()->write($output);
     return $response;
 });
-
-
 
 $app->group('/alumnos', function ($group) {
     $group->get('/dashboard', \App\Controllers\AlumnoController::class . ':showDashboard');
@@ -97,6 +92,23 @@ $app->post('/api/auth/register', \App\Controllers\AuthController::class . ':proc
 $app->get('/login', \App\Controllers\AuthController::class . ':showLoginForm');
 $app->post('/api/auth/login', \App\Controllers\AuthController::class . ':processLogin');
 $app->get('/logout', \App\Controllers\AuthController::class . ':logout');
+
+///Nuevo
+// Rutas para Cursos - CORREGIDAS Y ORGANIZADAS
+
+$app->group('/cursos', function ($group) {
+    // Mostrar formulario para crear nuevo curso
+    $group->get('/nuevo', CursoController::class . ':showForm');
+    
+    // Procesar creación de curso
+    $group->post('/guardar', CursoController::class . ':guardarCurso');
+    
+    // Listar todos los cursos
+    $group->get('/listar', CursoController::class . ':listarCursos');
+    
+    // Listar cursos por categoría
+    $group->get('/categoria/{id}', CursoController::class . ':listarCursos');
+});
 
 // --- Fin de Rutas ---
 

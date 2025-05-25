@@ -86,4 +86,28 @@ class MostrarCursosModel {
             throw new \Exception("Error al obtener información del alumno: " . $e->getMessage());
         }
     }
+
+    // Subir evidencia y marcar curso como completado
+    public function subirEvidencia($asignacion_id, $alumno_id, $evidencia_url) {
+        $query = "UPDATE alumnocurso 
+                  SET evidencia = :evidencia_url, 
+                      estado = 'completado', 
+                      fecha_completado = NOW()
+                  WHERE id = :asignacion_id 
+                    AND alumno_id = :alumno_id 
+                    AND estado = 'asignado'";
+        
+        try {
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':evidencia_url', $evidencia_url, \PDO::PARAM_STR);
+            $stmt->bindParam(':asignacion_id', $asignacion_id, \PDO::PARAM_INT);
+            $stmt->bindParam(':alumno_id', $alumno_id, \PDO::PARAM_INT);
+            
+            $stmt->execute();
+            
+            return $stmt->rowCount() > 0;
+        } catch (\PDOException $e) {
+            throw new \Exception("Error al subir evidencia: " . $e->getMessage());
+        }
+    }
 }

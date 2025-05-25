@@ -82,6 +82,9 @@ $app->group('/api/alumnos', function ($group) {
     // En la sección de rutas API Alumno, reemplazar las líneas existentes:
     $group->get('/cursos/mostrar/asignados', \App\Controllers\MostrarCursosController::class . ':getCursosAsignados');
     $group->get('/cursos/mostrar/completados', \App\Controllers\MostrarCursosController::class . ':getCursosCompletados');
+
+    $group->post('/cursos/evidencia', \App\Controllers\MostrarCursosController::class . ':subirEvidencia');
+    
 })->add($requireAlumno)->add($requireAuth); 
 
 

@@ -94,4 +94,103 @@ class MostrarCursosController {
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
     }
+
+    public function subirEvidencia(Request $request, Response $response, $args) {
+        // Verificar que el usuario esté autenticado
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        if (!isset($_SESSION['user_id'])) {
+            $payload = json_encode(['error' => 'Usuario no autenticado']);
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
+        }
+
+        // Crear conexión y modelo
+        $conexionObj = new Conexion();
+        $conexion = $conexionObj->getConexion();
+        $cursoModel = new MostrarCursosModel($conexion);
+
+        // Obtener información del alumno
+        $alumno = $cursoModel->getAlumnoByUsuarioId($_SESSION['user_id']);
+        
+        if (!$alumno) {
+            $payload = json_encode(['error' => 'Alumno no encontrado']);
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+        }
+
+        try {
+            // Obtener datos del formulario
+            $data = $request->getParsedBody();
+            $asignacion_id = $data['asignacion_id'] ?? null;
+
+            if (!$asignacion_id) {
+                $payload = json_encode(['error' => 'ID de asignación requerido']);
+                $response->getBody()->write($payload);
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+            }
+
+            // Manejar archivo subido
+            $uploadedFiles = $request->getUploadedFiles();
+            
+            if (!isset($uploadedFiles['evidencia']) || $uploadedFiles['evidencia']->getError() !== UPLOAD_ERR_OK) {
+                $payload = json_encode(['error' => 'No se pudo subir la imagen']);
+                $response->getBody()->write($payload);
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+            }
+
+            $uploadedFile = $uploadedFiles['evidencia'];
+            
+            // Validar que sea una imagen
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            $fileType = $uploadedFile->getClientMediaType();
+            
+            if (!in_array($fileType, $allowedTypes)) {
+                $payload = json_encode(['error' => 'Solo se permiten archivos de imagen (JPEG, PNG, GIF, WebP)']);
+                $response->getBody()->write($payload);
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+            }
+
+            // Crear directorio si no existe
+            $uploadDir = __DIR__ . '/../../public/uploads/evidencias/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            // Generar nombre único para el archivo
+            $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
+            $filename = 'evidencia_' . $asignacion_id . '_' . time() . '.' . $extension;
+            $filepath = $uploadDir . $filename;
+
+            // Mover archivo
+            $uploadedFile->moveTo($filepath);
+
+            // URL relativa para la base de datos
+            $evidenciaUrl = '/ProyectoFinalTecWeb/public/uploads/evidencias/' . $filename;
+
+            // Actualizar la base de datos
+            $resultado = $cursoModel->subirEvidencia($asignacion_id, $alumno['id'], $evidenciaUrl);
+
+            if ($resultado) {
+                $payload = json_encode([
+                    'success' => true,
+                    'message' => 'Evidencia subida correctamente. El curso ha sido marcado como completado.',
+                    'evidencia_url' => $evidenciaUrl
+                ]);
+            } else {
+                $payload = json_encode(['error' => 'Error al actualizar la base de datos']);
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+            }
+
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json');
+
+        } catch (Exception $e) {
+            $payload = json_encode(['error' => 'Error al subir evidencia: ' . $e->getMessage()]);
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    }
 }

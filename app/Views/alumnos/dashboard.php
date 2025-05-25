@@ -11,6 +11,7 @@
         //ACA PONGAN EL DASHBOARD
         require_once APP_ROOT . '/Views/layouts/header_alumnos.php'; 
     ?>
+    <div id="mensajeDashboard" style="display:none; padding: 15px; margin-bottom: 20px; border-radius: 5px;"></div>
 
     <h1>Dashboard del Alumno</h1>
     <p>¡Bienvenido, <?php echo htmlspecialchars($_SESSION['username'] ?? 'Alumno'); ?>!</p>
@@ -26,4 +27,6 @@
         require_once APP_ROOT . '/Views/layouts/footer.php'; 
     ?>
 </body>
+    <script src="/ProyectoFinalTecWeb/public/assets/js/app.js"></script>
+
 </html>

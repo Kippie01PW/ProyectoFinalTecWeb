@@ -9,6 +9,13 @@ use App\Models\PreferenciasAlumnoModel; // Import faltante agregado
 class PreferenciasAlumnoController {
 
     public function showFormulario(Request $request, Response $response, $args) {
+    // Manejar datos POST si existen (navegación entre páginas)
+    if ($request->getMethod() === 'POST') {
+        $data = $request->getParsedBody();
+        // Aquí podrías guardar temporalmente los datos si fuera necesario
+        // Por ahora solo redirigimos a la siguiente página
+    }
+    
         ob_start();
         require_once APP_ROOT . '/Views/Formulario.php';
         $output = ob_get_clean();
@@ -17,36 +24,50 @@ class PreferenciasAlumnoController {
     }
     
     public function guardarPreferencias(Request $request, Response $response, $args) {
-        
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'alumno') {
+        $response->getBody()->write(json_encode(['error' => 'No autenticado']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
+    }
+
+    $usuario_id = $_SESSION['user_id'];
+
+    try {
+        $pdo = (new \App\Core\Conexion())->getConexion();
+
+        // Buscar el alumno_id correspondiente al usuario_id
+        $stmt = $pdo->prepare("SELECT id FROM alumno WHERE usuario_id = ?");
+        $stmt->execute([$usuario_id]);
+        $alumno = $stmt->fetch();
+
+        if (!$alumno) {
+            $response->getBody()->write(json_encode([
+                'error' => 'No se encontró un alumno asociado al usuario.'
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
-        
-        // Solo usar el ID del alumno logueado
-        if (!isset($_SESSION['alumno_id'])) {
-            $response->getBody()->write(json_encode(['error' => 'No autenticado']));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
-        }
-        
-        $alumno_id = $_SESSION['alumno_id'];
+
+        $alumno_id = $alumno['id'];
+
         $data = $request->getParsedBody();
         $respuestas = $data['respuestas'] ?? [];
-        
-        try {
-            $pdo = (new Conexion())->getConexion();
-            $modelo = new PreferenciasAlumnoModel($pdo);
-            
-            $modelo->guardarPreferencias($alumno_id, $respuestas);
-            
-            $response->getBody()->write(json_encode(['success' => true]));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
-        } catch (\Exception $e) {
-            $error = [
-                'error' => 'No se pudieron guardar las respuestas',
-                'detalle' => $e->getMessage()
-            ];
-            $response->getBody()->write(json_encode($error));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
-        }
+
+        $modelo = new \App\Models\PreferenciasAlumnoModel($pdo);
+        $modelo->guardarPreferencias($alumno_id, $respuestas);
+
+        $response->getBody()->write(json_encode(['success' => true]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+    } catch (\Exception $e) {
+        $error = [
+            'error' => 'No se pudieron guardar las respuestas',
+            'detalle' => $e->getMessage()
+        ];
+        $response->getBody()->write(json_encode($error));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
     }
+}
+
 }

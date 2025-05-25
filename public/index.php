@@ -71,6 +71,8 @@ $app->group('/alumnos', function ($group) {
     $group->get('/cursos', \App\Controllers\AlumnoController::class . ':showCursosPage');
     //NUEVO
     $group->get('/preferencias/formulario', \App\Controllers\PreferenciasAlumnoController::class . ':showFormulario');
+    $group->post('/preferencias/formulario', \App\Controllers\PreferenciasAlumnoController::class . ':showFormulario');
+    $group->post('/preferencias/guardar', \App\Controllers\PreferenciasAlumnoController::class . ':guardarPreferencias');
 })->add($requireAlumno)->add($requireAuth); 
 
 // Rutas para Alumnos 
@@ -81,7 +83,11 @@ $app->group('/api/alumnos', function ($group) {
     $group->post('/clases/unirse', AlumnoController::class . ':unirseAClase');
 
     //NUEVO
-    $group->get('/preferencias/formulario', \App\Controllers\PreferenciasAlumnoController::class . ':showFormulario');
+   // $group->get('/preferencias/formulario', \App\Controllers\PreferenciasAlumnoController::class . ':showFormulario');
+   // $group->post('/preferencias/guardar', \App\Controllers\PreferenciasAlumnoController::class . ':guardarPreferencias');
+
+
+
 });
 
 // Rutas para Autenticación

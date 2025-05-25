@@ -40,16 +40,8 @@ $questions = [
   ]
 ];
 
-$preguntasMultiples = [
-  1 => [1, 4], 
-  2 => [1,3],   
-  3 => [3], 
-];
-
-
 $currentSection = $questions[$page];
 ?>
-
 
 <!DOCTYPE html>
 <html>
@@ -57,35 +49,72 @@ $currentSection = $questions[$page];
   <?php include __DIR__ . '/../Views/layouts/header_alumnos.php'; ?>
   <title>Formulario de Intereses</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .error-msg {
+      color: #dc3545 !important;
+      font-size: 0.875em;
+      margin-top: 0.25rem;
+    }
+    .form-check {
+      margin-bottom: 0.5rem;
+    }
+    .mb-3 {
+      border-bottom: 1px solid #dee2e6;
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .progress {
+      margin-bottom: 2rem;
+    }
+  </style>
 </head>
 <body>
 <div class="container mt-4">
+  <!-- Barra de progreso -->
+  <div class="progress mb-4">
+    <div class="progress-bar" role="progressbar" style="width: <?= ($page / $totalPages) * 100 ?>%" 
+         aria-valuenow="<?= $page ?>" aria-valuemin="0" aria-valuemax="<?= $totalPages ?>">
+      Página <?= $page ?> de <?= $totalPages ?>
+    </div>
+  </div>
+
   <h2><?= $currentSection['title'] ?></h2>
-  <form method="post" action="<?= $page < $totalPages ? '?page=' . ($page + 1) : 'resultado.php' ?>">
+  
+  <form method="post" action="<?= $page < $totalPages ? '?page=' . ($page + 1) : '#' ?>" id="formPreferencias">
     <?php $index = 1; foreach ($currentSection['questions'] as $question => $options): ?>
-        <?php $isMultiple = isset($preguntasMultiples[$page]) && in_array($index, $preguntasMultiples[$page]);?>
       <div class="mb-3">
-        <label class="form-label"><strong><?= $question ?></strong></label>
-
-        
-        <?php if ($isMultiple): ?>
-        <p class="text-info"><small>Puedes seleccionar más de una opción.</small></p>
-        <?php endif; ?>
-
+        <label class="form-label"><strong><?= htmlspecialchars($question) ?></strong></label>
         <?php foreach ($options as $key => $option): ?>
           <div class="form-check">
             <input class="form-check-input"
-                  type="<?= $isMultiple ? 'checkbox' : 'radio' ?>"
-                  name="q<?= $page ?>_<?= $index ?><?= $isMultiple ? '[]' : '' ?>"
+                  type="radio"
+                  name="q<?= $page ?>_<?= $index ?>"
                   value="<?= chr(97 + $key) ?>"
-                  <?= $isMultiple ? '' : 'required' ?>>
-            <label class="form-check-label">a) <?= $option ?></label>
+                  id="q<?= $page ?>_<?= $index ?>_<?= $key ?>"
+                  required>
+            <label class="form-check-label" for="q<?= $page ?>_<?= $index ?>_<?= $key ?>">
+              <?= chr(97 + $key) ?>) <?= htmlspecialchars($option) ?>
+            </label>
           </div>
         <?php endforeach; ?>
       </div>
-      <?php $index++; endforeach; ?>
-    <button type="submit" class="btn btn-primary"><?= $page < $totalPages ? 'Siguiente' : 'Enviar' ?></button>
+    <?php $index++; endforeach; ?>
+    
+    <div class="d-flex justify-content-between mt-4">
+      <?php if ($page > 1): ?>
+        <a href="?page=<?= $page - 1 ?>" class="btn btn-secondary">Anterior</a>
+      <?php else: ?>
+        <div></div>
+      <?php endif; ?>
+      
+      <button type="submit" class="btn btn-primary" id="btnEnviar">
+        <?= $page < $totalPages ? 'Siguiente' : 'Enviar' ?>
+      </button>
+    </div>
   </form>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/ProyectoFinalTecWeb/public/assets/js/formulario.js"></script>
 </body>
 </html>

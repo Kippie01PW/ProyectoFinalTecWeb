@@ -1,96 +1,136 @@
-$(document).ready(function() {
+$(document).ready(function () {
+    const baseUrl = "/ProyectoFinalTecWeb/public";
 
-    const baseUrl = "/ProyectoFinalTecWeb/public"; 
+    // Función para validar el formulario
+    function validarFormulario() {
+        const preguntas = document.querySelectorAll('form .mb-3');
+        let isValid = true;
 
-    function cargarCursosAsignados() {
-        $('#loading-asignados').show(); 
-        $('#tabla-asignados').hide();   
-        $('#tabla-asignados tbody').empty();
+        preguntas.forEach((preguntaDiv) => {
+            // Elimina mensajes previos de error
+            let msgError = preguntaDiv.querySelector('.error-msg');
+            if (msgError) msgError.remove();
+
+            const inputs = preguntaDiv.querySelectorAll('input[type="radio"]');
+            const seleccionado = Array.from(inputs).some(input => input.checked);
+
+            if (!seleccionado) {
+                const error = document.createElement('p');
+                error.classList.add('error-msg', 'text-danger', 'mt-1');
+                error.style.fontSize = '0.875em';
+                error.textContent = 'Por favor, responde esta pregunta.';
+                preguntaDiv.appendChild(error);
+
+                if (isValid) {
+                    inputs[0].focus();
+                }
+
+                isValid = false;
+            }
+        });
+
+        return isValid;
+    }
+
+    // Función para guardar datos en sessionStorage
+    function guardarDatosTemporales() {
+        const respuestas = {};
+        const campos = document.querySelectorAll('[name^="q"]');
+        const preguntasProcesadas = new Set();
+
+        campos.forEach(input => {
+            const nombre = input.name;
+
+            if (preguntasProcesadas.has(nombre)) return;
+
+            const inputsMismoNombre = document.querySelectorAll(`[name="${nombre}"]`);
+
+            if (inputsMismoNombre[0].type === "radio") {
+                let seleccionado = null;
+                inputsMismoNombre.forEach(rb => {
+                    if (rb.checked) seleccionado = rb.value;
+                });
+                respuestas[nombre] = seleccionado;
+            }
+
+            preguntasProcesadas.add(nombre);
+        });
+
+        const datosExistentes = JSON.parse(sessionStorage.getItem('preferenciasFormulario') || '{}');
+        const datosCombinados = { ...datosExistentes, ...respuestas };
+        sessionStorage.setItem('preferenciasFormulario', JSON.stringify(datosCombinados));
+
+        return respuestas;
+    }
+
+    // Función para enviar todas las preferencias
+    function enviarPreferencias() {
+        const todasLasRespuestas = JSON.parse(sessionStorage.getItem('preferenciasFormulario') || '{}');
+
+        console.log("Todas las respuestas a enviar:", todasLasRespuestas);
+
+        const numRespuestas = Object.keys(todasLasRespuestas).length;
+        if (numRespuestas < 20) {
+            alert(`Faltan respuestas. Se encontraron ${numRespuestas} de 20 esperadas.`);
+            return;
+        }
 
         $.ajax({
-            url: baseUrl + "/api/alumnos/cursos/asignados",
-            type: "GET",
+            url: baseUrl + "/alumnos/preferencias/guardar",
+            method: "POST",
             dataType: "json",
-            success: function(cursos) {
-                $('#loading-asignados').hide(); 
-                $('#tabla-asignados').show();   
-                let tablaBody = $('#tabla-asignados tbody');
-
-                if (cursos.length === 0) {
-                    tablaBody.append('<tr><td colspan="4">No tienes cursos asignados actualmente.</td></tr>');
+            data: { respuestas: todasLasRespuestas },
+            success: function (data) {
+                if (data.success) {
+                    alert("Preferencias guardadas correctamente.");
+                    sessionStorage.removeItem('preferenciasFormulario');
+                    window.location.href = baseUrl + "/alumnos/dashboard";
                 } else {
-                    // Recorre cada curso y crea una fila en la tabla
-                    cursos.forEach(function(curso) {
-                        tablaBody.append(`
-                            <tr>
-                                <td>${escapeHtml(curso.titulo)}</td>
-                                <td>${escapeHtml(curso.descripcion || 'N/A')}</td>
-                                <td>${escapeHtml(curso.categoria_nombre || 'Sin categoría')}</td>
-                                <td><a href="${escapeHtml(curso.enlace_externo || '#')}" target="_blank" class="btn btn-primary btn-sm">Ir</a></td>
-                            </tr>
-                        `);
-                    });
+                    alert("Error al guardar las preferencias: " + (data.error || 'Error desconocido'));
                 }
             },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.error("Error AJAX (Asignados):", textStatus, errorThrown);
-                $('#loading-asignados').html('<div class="alert alert-danger">Error al cargar los cursos asignados. Revisa la consola (F12).</div>');
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error("Error AJAX:", textStatus, errorThrown);
+                console.error("Respuesta del servidor:", jqXHR.responseText);
+                alert("Ocurrió un error al enviar las respuestas. Revisa la consola para más detalles.");
             }
         });
     }
 
+    // Manejar el clic del botón
+    $('#btnEnviar').on('click', function (e) {
+        e.preventDefault();
 
-    function cargarCursosCompletados() {
-        $('#loading-completados').show();
-        $('#tabla-completados').hide();
-        $('#tabla-completados tbody').empty();
+        if (!validarFormulario()) {
+            return false;
+        }
 
-        $.ajax({
-            url: baseUrl + "/api/alumnos/cursos/completados",
-            type: "GET",
-            dataType: "json",
-            success: function(cursos) {
-                $('#loading-completados').hide();
-                $('#tabla-completados').show();
-                let tablaBody = $('#tabla-completados tbody');
+        const btnText = $(this).text().trim();
 
-                if (cursos.length === 0) {
-                    tablaBody.append('<tr><td colspan="3">No has completado ningún curso.</td></tr>');
-                } else {
-                    cursos.forEach(function(curso) {
-                        tablaBody.append(`
-                            <tr>
-                                <td>${escapeHtml(curso.titulo)}</td>
-                                <td>${escapeHtml(curso.fecha_completado || 'N/A')}</td>
-                                <td><a href="${escapeHtml(curso.evidencia || '#')}" target="_blank" class="btn btn-info btn-sm">Ver</a></td>
-                            </tr>
-                        `);
-                    });
-                }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.error("Error AJAX (Completados):", textStatus, errorThrown);
-                $('#loading-completados').html('<div class="alert alert-danger">Error al cargar los cursos completados. Revisa la consola (F12).</div>');
+        if (btnText === "Enviar") {
+            guardarDatosTemporales();
+            enviarPreferencias();
+        } else {
+            guardarDatosTemporales();
+            document.getElementById('formPreferencias').submit();
+        }
+    });
+
+    // Cargar datos guardados al cargar la página
+    function cargarDatosGuardados() {
+        const datosGuardados = JSON.parse(sessionStorage.getItem('preferenciasFormulario') || '{}');
+
+        Object.keys(datosGuardados).forEach(nombre => {
+            const valor = datosGuardados[nombre];
+            const inputs = document.querySelectorAll(`[name="${nombre}"]`);
+
+            if (inputs.length > 0 && inputs[0].type === 'radio') {
+                inputs.forEach(input => {
+                    input.checked = input.value === valor;
+                });
             }
         });
     }
 
-
-    function escapeHtml(text) {
-        var map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-    
-        return text == null ? '' : String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
-    }
-
-
-    
-    cargarCursosAsignados();
-    cargarCursosCompletados();
-
-}); 
+    cargarDatosGuardados();
+});

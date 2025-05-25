@@ -33,7 +33,7 @@
                         </a>
                     </li>
                     <li class="nav-item mx-2">
-                        <a class="nav-link" href="###">
+                        <a class="nav-link" href="../clases/">
                             <i class="bi bi-people-fill me-1"></i>
                             Mis Alumnos
                         </a>

@@ -52,6 +52,11 @@ $app->group('/api/alumnos', function ($group) {
 $app->get('/register', AuthController::class . ':showRegisterForm'); // <-- ¡NUEVO!
 $app->post('/api/auth/register', \App\Controllers\AuthController::class . ':processRegistration');
 
+// En public/index.php
+
+$app->get('/login', \App\Controllers\AuthController::class . ':showLoginForm');
+$app->post('/api/auth/login', \App\Controllers\AuthController::class . ':processLogin');
+
 // --- Fin de Rutas ---
 
 // 7. Ejecutar la Aplicación

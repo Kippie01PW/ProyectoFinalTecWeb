@@ -90,6 +90,77 @@ class AuthController {
         return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
     }
 
-    // Aquí añadiremos showLoginForm y processLogin más adelante...
+    /**
+     * Muestra el formulario de login.
+     * Ruta: GET /login
+     */
+    public function showLoginForm(Request $request, Response $response, $args)
+    {
+        ob_start();
+        require_once APP_ROOT . '/Views/auth/login.php'; // Carga la vista
+        $output = ob_get_clean();
+        $response->getBody()->write($output);
+        return $response;
+    }
+
+    /**
+     * Procesa los datos del formulario de login.
+     * Ruta: POST /api/auth/login
+     */
+    public function processLogin(Request $request, Response $response, $args)
+    {
+        // Aseguramos que la sesión esté iniciada
+        if (session_status() == PHP_SESSION_NONE) { session_start(); }
+
+        $data = $request->getParsedBody();
+        $email = trim($data['email'] ?? '');
+        $password = $data['password'] ?? '';
+
+        // Validación
+        if (empty($email) || empty($password)) {
+            $responseData = ['success' => false, 'message' => 'Correo y contraseña son obligatorios.'];
+            $response->getBody()->write(json_encode($responseData));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        $usuarioModel = new \App\Models\UsuarioModel();
+        $usuario = $usuarioModel->getUserByEmail($email);
+
+        // Verificación
+        if ($usuario && password_verify($password, $usuario['password_hash'])) {
+            // ¡Éxito! Iniciar sesión y guardar datos en $_SESSION
+            $_SESSION['user_id'] = $usuario['id'];
+            $_SESSION['username'] = $usuario['username'];
+            $_SESSION['role'] = $usuario['role'];
+
+            // MUY IMPORTANTE: Necesitamos el ID de Alumno/Maestro para nuestras APIs
+            $pdo = (new \App\Core\Conexion())->getConexion(); // Obtenemos conexión
+            if ($usuario['role'] === 'alumno') {
+                $stmt = $pdo->prepare("SELECT id FROM alumno WHERE usuario_id = :id");
+                $stmt->execute([':id' => $usuario['id']]);
+                $perfil = $stmt->fetch(\PDO::FETCH_ASSOC);
+                $_SESSION['alumno_id'] = $perfil ? $perfil['id'] : null;
+            } elseif ($usuario['role'] === 'maestro') {
+                $stmt = $pdo->prepare("SELECT id FROM maestro WHERE usuario_id = :id");
+                $stmt->execute([':id' => $usuario['id']]);
+                $perfil = $stmt->fetch(\PDO::FETCH_ASSOC);
+                $_SESSION['maestro_id'] = $perfil ? $perfil['id'] : null;
+            }
+
+            // Construimos la URL de redirección usando las rutas de Slim
+            $redirectUrl = "/ProyectoFinalTecWeb/public/{$usuario['role']}/dashboard";
+
+            $responseData = ['success' => true, 'redirect' => $redirectUrl];
+            $status = 200; // 200 OK
+
+        } else {
+            // Credenciales incorrectas
+            $responseData = ['success' => false, 'message' => 'Credenciales incorrectas.'];
+            $status = 401; // 401 Unauthorized
+        }
+
+        $response->getBody()->write(json_encode($responseData));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
+    }
 }
 ?>

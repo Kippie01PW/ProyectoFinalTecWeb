@@ -37,9 +37,9 @@
                     
                     <div class="text-center mt-4">
                         <p class="text-dark">¿No tienes cuenta? 
-                            <a href="/PROYECTOFINALTECWEB/?action=auth/register" class="text-decoration-none text-azul-logo">
-                                Regístrate aquí
-                            </a>
+                        <a href="/ProyectoFinalTecWeb/public/register" class="text-decoration-none text-azul-logo">
+                            Regístrate aquí
+                        </a>
                         </p>
                     </div>
                     

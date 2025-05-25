@@ -77,9 +77,6 @@ $app->group('/api/alumnos', function ($group) {
     $group->get('/clases', AlumnoController::class . ':getMisClases');
     $group->post('/clases/unirse', AlumnoController::class . ':unirseAClase');
 
-    //NUEVO
-   // $group->get('/preferencias/formulario', \App\Controllers\PreferenciasAlumnoController::class . ':showFormulario');
-   // $group->post('/preferencias/guardar', \App\Controllers\PreferenciasAlumnoController::class . ':guardarPreferencias');
 });
 
 // Rutas para Autenticación

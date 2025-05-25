@@ -120,3 +120,4 @@ $currentSection = $questions[$page];
 <script src="/ProyectoFinalTecWeb/public/assets/js/formulario.js"></script>
 </body>
 </html>
+<?php include __DIR__ . '/layouts/footer.php';  ?>

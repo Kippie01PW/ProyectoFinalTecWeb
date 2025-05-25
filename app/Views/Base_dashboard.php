@@ -1,119 +1,29 @@
 <?php 
-    include __DIR__ . '/layouts/header_maestro.php';
-?>
-<?php
-$host = 'localhost';
-$usuario = 'root';
-$contrasena = 'Angueles.3';
-$base_de_datos = 'educacionps';
+// Incluir el header
+include __DIR__ . '/layouts/header_maestro.php';
 
-$conexion = new mysqli($host, $usuario, $contrasena, $base_de_datos);
+// Incluir las clases
+require_once __DIR__ . '/../Models/Data_Maestro.php';
+require_once __DIR__ . '/../Controllers/MaestroController.php';
 
-if ($conexion->connect_error) {
-    die("Error de conexión: " . $conexion->connect_error);
-}
-
+// ID del maestro (puedes obtenerlo de la sesión o parámetro)
 $maestro_id = 4;
 
+// Crear instancia de la clase de consultas (ya no necesita parámetros de conexión)
+$dashboard = new Data_Maestro($maestro_id);
 
-function contarOpciones($conexion, $pregunta, $maestro_id) {
-    $consulta = "SELECT JSON_UNQUOTE(JSON_EXTRACT(pa.$pregunta, '$')) AS opcion
-                 FROM preferenciasalumno pa
-                 JOIN alumno a ON pa.alumno_id = a.id
-                 JOIN alumnocurso ac ON a.id = ac.alumno_id
-                 JOIN cursos c ON ac.curso_id = c.id
-                 JOIN clases cl ON c.clase_id = cl.id
-                 WHERE cl.maestro_id = $maestro_id";
+// Obtener todos los datos necesarios
+$datosPreguntas = $dashboard->getDatosPreguntas();
+$preguntasTexto = $dashboard->getPreguntasTexto();
+$totalAlumnos = $dashboard->getTotalAlumnos();
+$totalCursos = $dashboard->getTotalCursos();
+$alumnosTerminados = $dashboard->getAlumnosTerminados();
+$maestro = $dashboard->getDatosMaestro();
+$datosProgreso = $dashboard->getDatosProgreso();
 
-    $resultado = mysqli_query($conexion, $consulta);
-
-    $conteo = [];
-    while ($fila = mysqli_fetch_assoc($resultado)) {
-        $opcion = $fila['opcion'];
-        if (!isset($conteo[$opcion])) {
-            $conteo[$opcion] = 0;
-        }
-        $conteo[$opcion]++;
-    }
-    return $conteo;
-}
-
-
-$datosPreguntas = [
-    'pregunta1' => contarOpciones($conexion, 'pregunta1',$maestro_id),
-    'pregunta2' => contarOpciones($conexion, 'pregunta2',$maestro_id),
-    'pregunta4' => contarOpciones($conexion, 'pregunta4',$maestro_id),
-    'pregunta5' => contarOpciones($conexion, 'pregunta5',$maestro_id),
-    'pregunta11' => contarOpciones($conexion, 'pregunta11',$maestro_id),
-    'pregunta15' => contarOpciones($conexion, 'pregunta15',$maestro_id),
-    'pregunta20' => contarOpciones($conexion, 'pregunta20',$maestro_id),
-];
-
-$preguntasTexto = [
-    'pregunta1' => '¿Qué área del conocimiento te interesa más?',
-    'pregunta2' => '¿En qué área sueles obtener mejores calificaciones?',
-    'pregunta4' => '¿Qué prefieres hacer?',
-    'pregunta5' => '¿Cómo te gusta aprender temas nuevos?',
-    'pregunta11' => '¿Cómo aprendes mejor?',
-    'pregunta15' => '¿Con qué frecuencia utilizas tecnología para estudiar?',
-    'pregunta20' => '¿Qué te motiva más a aprender en un curso?'
-];
-// Total de alumnos
-$sqlAlumnos = "SELECT COUNT(DISTINCT a.id) AS total_alumnos
-               FROM alumno a
-               JOIN alumnocurso ac ON a.id = ac.alumno_id
-               JOIN cursos c ON ac.curso_id = c.id
-               JOIN clases cl ON c.clase_id = cl.id
-               WHERE cl.maestro_id = $maestro_id";
-
-$resultAlumnos = $conexion->query($sqlAlumnos);
-if (!$resultAlumnos) {
-    die("Error en consulta de alumnos: " . $conexion->error);
-}
-$totalAlumnos = $resultAlumnos->fetch_assoc()['total_alumnos'];
-
-
-$sqlCursos = "SELECT COUNT(*) AS total_cursos FROM cursos";
-$resultCursos = $conexion->query($sqlCursos);
-if (!$resultCursos) {
-    die("Error en consulta de cursos: " . $conexion->error);
-}
-$totalCursos = $resultCursos->fetch_assoc()['total_cursos'];
-
-
-$sqlAlumnosTerminados = "SELECT COUNT(DISTINCT ac.alumno_id) AS alumnos_terminados
-                         FROM alumnocurso ac
-                         JOIN cursos c ON ac.curso_id = c.id
-                         JOIN clases cl ON c.clase_id = cl.id
-                         WHERE cl.maestro_id = $maestro_id AND ac.estado = 'completado'";
-$resultTerminados = $conexion->query($sqlAlumnosTerminados);
-if (!$resultTerminados) {
-    die("Error en consulta de alumnos terminados: " . $conexion->error);
-}
-$alumnosTerminados = $resultTerminados->fetch_assoc()['alumnos_terminados'];
-
-// Progreso por fecha de completado
-$sqlProgreso = "SELECT ac.estado, COUNT(*) AS total
-                FROM alumnocurso ac
-                JOIN cursos c ON ac.curso_id = c.id
-                JOIN clases cl ON c.clase_id = cl.id
-                WHERE cl.maestro_id = $maestro_id
-                GROUP BY ac.estado";
-
-$resultProgreso = $conexion->query($sqlProgreso);
-if (!$resultProgreso) {
-    die("Error en consulta de progreso: " . $conexion->error);
-}
-
-$etiquetasProgreso = [];
-$valoresProgreso = [];
-while ($row = $resultProgreso->fetch_assoc()) {
-    $etiquetasProgreso[] = ucfirst($row['estado']);
-    $valoresProgreso[] = (int)$row['total'];
-}
-
+// Crear instancia del manejador de JavaScript
+$jsHandler = new MaestroController($datosPreguntas, $preguntasTexto, $datosProgreso);
 ?>
-
 
 <!DOCTYPE html>
 <html lang="es">
@@ -121,13 +31,12 @@ while ($row = $resultProgreso->fetch_assoc()) {
     <meta charset="UTF-8">
     <title>Dashboard Maestros</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
-
-
+    <!-- SweetAlert2 para popups más elegantes -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -135,25 +44,25 @@ while ($row = $resultProgreso->fetch_assoc()) {
 <div class="container-fluid">
     <div class="row">
         <div class="col-12 col-lg-10 mx-auto p-4 mt-5">
-            <!-- ===== GRÁFICAS ===== -->
+            <!-- ===== TÍTULO ===== -->
              <div class="titulo px-5 ms-5 mb-4">
-                <h1 class="text-dark fw-bold fs-2" >DASHBOARD MAESTRO</h1>
+                <h1 class="text-dark fw-bold fs-2">DASHBOARD MAESTRO</h1>
              </div>
              
             <!-- ===== SECCIÓN DINÁMICA DE GRÁFICA ===== -->
             <div class="card mb-4">
                 <div class="card-body">
                     <div class="row">
-                    <!-- Gráfica principal a la izquierda -->
+                        <!-- Gráfica principal a la izquierda -->
                         <div class="col-md-7 d-flex flex-column align-items-center">
-                        <!-- Botones de la gráfica -->
+                            <!-- Título de la gráfica -->
                             <h5 id="tituloGrafica" class="fw-bold text-center mb-4"></h5>
                             <div class="grafico-container mx-auto" style="width: 100%; height: 400px;">
                                 <canvas id="grafico"></canvas>
                             </div>
 
-
-                            <div class="d-flex justify-content-center mt-3">
+                            <!-- Controles de la gráfica -->
+                            <div class="d-flex justify-content-center mt-4">
                                 <select id="dataSelect" class="form-select me-2 text-center w-auto">
                                     <option value="formulario">Formulario</option>
                                     <option value="progreso">Progreso</option>
@@ -167,11 +76,11 @@ while ($row = $resultProgreso->fetch_assoc()) {
                             </div>
                         </div>
 
-                        <!-- Recuadro adicional a la derecha -->
-                        <div class="col-md-5 d-flex flex-column align-items-start">
-                            <div class="card border-secondary w-100">
+                        <!-- Panel de estadísticas a la derecha -->
+                        <div class="col-md-5" style="display: flex; align-items: center; height: 400px;">
+                            <div class="card border-secondary w-100" style="margin: auto;">
                                 <div class="card-header bg-secondary text-white text-center">
-                                    Anexos
+                                    Estadísticas
                                 </div>
                                 <div class="card-body">
                                     <ul class="list-group list-group-flush">
@@ -194,246 +103,250 @@ while ($row = $resultProgreso->fetch_assoc()) {
                     </div>
                 </div>
             </div>
+
+            <!-- ===== SECCIÓN DE PERFIL Y CONFIGURACIÓN ===== -->
+            <div class="row">
+                <!-- Perfil del maestro -->
+                <div class="col-md-5">
+                    <div class="card mb-4 mt-4">
+                        <div class="card-body">
+                            <i class="bi bi-person-circle fs-1"></i>
+                            <div class="card-body">
+                                <form id="formularioMaestro" action="actualizar_maestro.php" method="POST">
+                                    <input type="hidden" name="maestro_id" value="<?= $maestro_id ?>">
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Nombre:</label>
+                                        <input type="text" class="form-control" value="<?= htmlspecialchars($maestro['username']) ?>" readonly>
+                                    </div>
+
+                                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                                        <div style="flex: 1;">
+                                            <label class="form-label fw-semibold">Correo:</label>
+                                            <input type="email" name="correo" id="inputCorreo" class="form-control" value="<?= htmlspecialchars($maestro['email']) ?>">
+                                        </div>
+                                        <button type="button" class="btn btn-outline-primary ms-3 mt-4" onclick="actualizarDato('correo')">Actualizar</button>
+                                    </div>
+
+                                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                                        <div style="flex: 1;">
+                                            <label class="form-label fw-semibold">Contraseña:</label>
+                                            <input type="password" name="contrasena" id="inputContrasena" class="form-control" placeholder="Nueva contraseña">
+                                        </div>
+                                        <button type="button" class="btn btn-outline-secondary ms-3 mt-4" onclick="actualizarDato('contrasena')">Actualizar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel de información adicional -->
+                <div class="col-md-7">
+                    <div class="card mb-4 mt-4">
+                        <div class="card-body">
+                            <i class="bi bi-info-circle fs-1"></i>
+                            <div class="card-body">
+                                <h5 class="card-title">Información del Dashboard</h5>
+                                <p class="card-text">
+                                    Este dashboard te permite visualizar las estadísticas de tus alumnos y cursos. 
+                                    Puedes cambiar entre diferentes tipos de gráficos y explorar las respuestas 
+                                    del formulario de preferencias de aprendizaje.
+                                </p>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <small class="text-muted">
+                                            <strong>Tipos de gráfico disponibles:</strong><br>
+                                            • Barras<br>
+                                            • Línea<br>
+                                            • Dona<br>
+                                            • Circular
+                                        </small>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">
+                                            <strong>Datos disponibles:</strong><br>
+                                            • Respuestas del formulario<br>
+                                            • Progreso de alumnos<br>
+                                            • Estadísticas generales
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-</body>
-</html>
-
 
 <script>
-// Variables desde PHP (convertidas a JSON)
-const textosPreguntas = <?= json_encode($preguntasTexto) ?>;
-const datos = {
-    formulario: {
-        preguntas: <?= json_encode($datosPreguntas) ?>
-    },
-    progreso: {
-        etiquetas: <?= json_encode($etiquetasProgreso) ?>,
-        valores: <?= json_encode($valoresProgreso) ?>
-    }
-};
-
-let chart;
-let tipoGrafico = 'bar';
-let indicePregunta = 0;
-
-function dividirTexto(texto, longitud = 20) {
-    if (texto.length <= longitud) return texto;
-    const palabras = texto.split(" ");
-    const lineas = [];
-    let linea = "";
-
-    palabras.forEach(palabra => {
-        if ((linea + palabra).length > longitud) {
-            lineas.push(linea.trim());
-            linea = "";
+// Función para manejar las actualizaciones con popup
+function actualizarDato(tipo) {
+    let titulo, mensaje, valor, inputId;
+    
+    if (tipo === 'correo') {
+        titulo = 'Actualizar Correo Electrónico';
+        mensaje = '¿Estás seguro de que deseas actualizar tu correo electrónico?';
+        inputId = 'inputCorreo';
+        valor = document.getElementById(inputId).value;
+        
+        // Validar email
+        if (!validarEmail(valor)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Por favor ingresa un correo electrónico válido'
+            });
+            return;
         }
-        linea += palabra + " ";
-    });
-    if (linea.trim()) lineas.push(linea.trim());
-    return lineas;
-}
-
-function generarColores(cantidad) {
-    const baseColor = [54, 162, 235]; // Azul base
-    return Array.from({ length: cantidad }, (_, i) => {
-        const factor = 0.5 + (i / cantidad) * 0.5; // Tonos del 50% al 100%
-        return `rgba(${baseColor[0]}, ${baseColor[1]}, ${baseColor[2]}, ${factor})`;
-    });
-}
-
-
-function crearGrafico(tipoContenido) {
-    actualizarTituloGrafica(tipoContenido);
-    const ctx = document.getElementById('grafico').getContext('2d');
-    if (chart) chart.destroy();
-
-    if (tipoContenido === 'formulario') {
-        const clavesPreguntas = Object.keys(datos.formulario.preguntas);
-        const clave = clavesPreguntas[indicePregunta];
-        const valores = datos.formulario.preguntas[clave];
-        const etiquetas = Object.keys(valores).map(e => dividirTexto(e));
-        const datosValores = Object.values(valores);
-
-        chart = new Chart(ctx, {
-            type: tipoGrafico,
-            data: {
-                labels: etiquetas,
-                datasets: [{
-                    label: tipoContenido,
-                    data: datosValores,
-                    backgroundColor: [
-                        '#a8e6a3', '#81d981', '#5cc25c',
-                        '#42b342', '#2e9e2e', '#1c7f1c'
-                    ],
-
-                    borderWidth: 1,
-                    fill: false,
-                    tension: 0.1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: tipoGrafico === 'pie' || tipoGrafico === 'doughnut',
-                        position: 'top',
-                        labels: {
-                            padding: 20 
-                        }
-                    },
-                datalabels: tipoGrafico !== 'line' ? {
-                    color: '#000',
-                    anchor: 'center',
-                    align: 'center',
-                    formatter: (value, context) => {
-                        const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                        const porcentaje = total ? (value / total * 100).toFixed(1) + '%' : '0%';
-                        return porcentaje;
-                    }
-                } : false
-
-                },
-                scales: tipoGrafico !== 'pie' && tipoGrafico !== 'doughnut' ? {
-                    y: {
-                        beginAtZero: true
-                    },
-                    x: {
-                        ticks: {
-                            callback: function(value) {
-                                const label = this.getLabelForValue(value);
-                                return Array.isArray(label) ? label.join(' ') : label;
-                            }
-                        }
-                    }
-                } : {}
-            },
-            plugins: [ChartDataLabels]
-        });
-
-    } else {
-        const etiquetas = datos[tipoContenido].etiquetas;
-        const valores = datos[tipoContenido].valores;
-        if (chart) {
-            chart.destroy();
+    } else if (tipo === 'contrasena') {
+        titulo = 'Actualizar Contraseña';
+        mensaje = '¿Estás seguro de que deseas actualizar tu contraseña?';
+        inputId = 'inputContrasena';
+        valor = document.getElementById(inputId).value;
+        
+        // Validar contraseña
+        if (valor.length < 6) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'La contraseña debe tener al menos 6 caracteres'
+            });
+            return;
         }
+    }
+    
+    // Mostrar popup de confirmación
+    Swal.fire({
+        title: titulo,
+        text: mensaje,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, actualizar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Realizar la actualización
+            realizarActualizacion(tipo, valor);
+        }
+    });
+}
 
-        chart = new Chart(ctx, {
-            type: tipoGrafico,
-            data: {
-                labels: etiquetas,
-                datasets: [{
-                    label: tipoContenido,
-                    data: valores,
-                    backgroundColor: tipoGrafico === 'pie' || tipoGrafico === 'doughnut'
-                        ? ['#a8e6a3', '#81d981', '#5cc25c', '#42b342', '#2e9e2e'] 
-                        : Array(valores.length).fill('rgba(85, 192, 75, 0.5)'), 
-                    borderColor: tipoGrafico === 'pie' || tipoGrafico === 'doughnut'
-                        ? ['#66bb6a', '#4caf50', '#43a047', '#388e3c', '#2e7d32']
-                        : Array(valores.length).fill('rgb(75, 192, 87)'),
-
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: tipoGrafico === 'pie' || tipoGrafico === 'doughnut' ? 'bottom' : 'top',
-                        labels: {
-                            padding: tipoGrafico === 'pie' || tipoGrafico === 'doughnut' ? 20 : 10,
-                            boxWidth: 20,
-                            boxHeight: 20
-                        }
-                    },
-                    datalabels: tipoGrafico !== 'line' ? {
-                        color: '#000',
-                        anchor: 'center',
-                        align: 'center',
-                        formatter: (value, context) => {
-                            const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                            const porcentaje = total ? (value / total * 100).toFixed(1) + '%' : '0%';
-                            return porcentaje;
-                        }
-                    } : false
-                },
-                scales: tipoGrafico !== 'pie' && tipoGrafico !== 'doughnut' ? {
-                    y: {
-                        beginAtZero: true
-                    },
-                    x: {
-                        ticks: {
-                            callback: function(value, index) {
-                                const label = this.getLabelForValue(value);
-                                return Array.isArray(label) ? label : [label];
-                            }
-                        }
-                    }
-                } : {},
-            },
-            plugins: [ChartDataLabels]
+// Función para realizar la actualización vía AJAX
+function realizarActualizacion(tipo, valor) {
+    const formData = new FormData();
+    formData.append('maestro_id', <?= $maestro_id ?>);
+    formData.append('accion', tipo);
+    
+    if (tipo === 'correo') {
+        formData.append('correo', valor);
+    } else if (tipo === 'contrasena') {
+        formData.append('contrasena', valor);
+    }
+    
+    // Mostrar loading
+    Swal.fire({
+        title: 'Actualizando...',
+        text: 'Por favor espera',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+    
+    // Realizar petición AJAX
+    fetch('actualizar_maestro.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Actualizado!',
+                text: data.message || 'Los datos se han actualizado correctamente',
+                timer: 2000,
+                showConfirmButton: false
+            });
+            
+            // Limpiar campo de contraseña si fue actualizada
+            if (tipo === 'contrasena') {
+                document.getElementById('inputContrasena').value = '';
+            }
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message || 'Ocurrió un error al actualizar los datos'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error de conexión'
         });
+    });
+}
 
+// Función para validar email
+function validarEmail(email) {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+}
+
+// También puedes usar Bootstrap Modal si prefieres no usar SweetAlert2
+function mostrarModalBootstrap(tipo) {
+    // Código alternativo usando Bootstrap Modal nativo
+    const modalHtml = `
+        <div class="modal fade" id="modalActualizar" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmar Actualización</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Estás seguro de que deseas actualizar tu ${tipo}?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" onclick="confirmarActualizacion('${tipo}')">Actualizar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Agregar modal al DOM si no existe
+    if (!document.getElementById('modalActualizar')) {
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
     }
+    
+    // Mostrar modal
+    const modal = new bootstrap.Modal(document.getElementById('modalActualizar'));
+    modal.show();
 }
-
-function cambiarTipoGrafico() {
-    const tipos = ['bar', 'line', 'doughnut', 'pie'];
-    const index = tipos.indexOf(tipoGrafico);
-    tipoGrafico = tipos[(index + 1) % tipos.length];
-    const tipoContenido = document.getElementById('dataSelect').value;
-
-    crearGrafico(tipoContenido);
-}
-function cambiarPregunta() {
-    const tipoContenido = document.getElementById('dataSelect').value;
-    if (tipoContenido === 'formulario') {
-        const total = Object.keys(datos.formulario.preguntas).length;
-        indicePregunta = (indicePregunta + 1) % total;
-        crearGrafico(tipoContenido);
-    }
-}
-
-function actualizarTituloGrafica(tipoContenido) {
-    const titulo = document.getElementById('tituloGrafica');
-    const botonCambiarPregunta = document.getElementById('Cambiar_Pregunta');
-    if (tipoContenido === 'formulario') {
-        const clavesPreguntas = Object.keys(datos.formulario.preguntas);
-        const clave = clavesPreguntas[indicePregunta];
-        titulo.textContent = "Formulario - " + (textosPreguntas[clave] || clave);
-        botonCambiarPregunta.style.display = 'inline-block'; // Mostrar botón
-    } else if (tipoContenido === 'progreso') {
-        titulo.textContent = "Progreso de Alumnos";
-        botonCambiarPregunta.style.display = 'none';
-    } else {
-        titulo.textContent = "";
-        botonCambiarPregunta.style.display = 'none';
-    }
-}
-
-
-document.addEventListener("DOMContentLoaded", () => {
-   document.getElementById('dataSelect').addEventListener('change', () => {
-       const seleccion = document.getElementById('dataSelect').value;
-       indicePregunta = 0;
-       crearGrafico(seleccion);
-   });
-
-   document.getElementById('Cambiar_Gráfico').addEventListener('click', cambiarTipoGrafico);
-
-   document.getElementById('Cambiar_Pregunta').addEventListener('click', cambiarPregunta);
-
-   crearGrafico('formulario');
-});
-
-
 </script>
-<?php
-$conexion->close();
+
+<?php 
+// Generar el JavaScript
+echo $jsHandler->generarJavaScript();
+
+// Cerrar la conexión
+$dashboard->cerrarConexion();
 ?>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 
 <?php 
     include __DIR__ . '/layouts/footer.php'; 

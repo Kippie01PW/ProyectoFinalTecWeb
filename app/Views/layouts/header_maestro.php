@@ -39,7 +39,7 @@
                         </a>
                     </li>
                     <li class="nav-item mx-2">
-                        <a class="btn btn-success" href="###">
+                        <a class="btn btn-success" href="../cursos/nuevo">
                             <i class="bi bi-plus-circle me-2"></i>
                             Nuevo Curso
                         </a>

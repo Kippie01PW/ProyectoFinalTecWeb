@@ -70,16 +70,14 @@ $app->group('/alumnos', function ($group) {
     $group->post('/preferencias/guardar', \App\Controllers\PreferenciasAlumnoController::class . ':guardarPreferencias');
 })->add($requireAlumno)->add($requireAuth); 
 
-// Rutas para Alumnos 
+// Rutas API Alumno 
 $app->group('/api/alumnos', function ($group) {
-    $group->get('/cursos/asignados', AlumnoController::class . ':getCursosAsignados');
-    $group->get('/cursos/completados', AlumnoController::class . ':getCursosCompletados');
-    $group->get('/clases', AlumnoController::class . ':getMisClases');
-    //$group->post('/clases/unirse', AlumnoController::class . ':unirseAClase');
+    $group->get('/cursos/asignados', \App\Controllers\AlumnoController::class . ':getCursosAsignados'); 
+    $group->get('/cursos/completados', \App\Controllers\AlumnoController::class . ':getCursosCompletados');
+    $group->get('/clases', \App\Controllers\AlumnoController::class . ':getMisClases');
+    // $group->post('/clases/unirse', \App\Controllers\AlumnoController::class . ':unirseAClase'); // <-- COMENTAREMOS O ELIMINAREMOS ESTA
+})->add($requireAlumno)->add($requireAuth); 
 
-});
-
-// Rutas para Autenticación
 
 $app->get('/register', AuthController::class . ':showRegisterForm'); // <-- ¡NUEVO!
 $app->post('/api/auth/register', \App\Controllers\AuthController::class . ':processRegistration');

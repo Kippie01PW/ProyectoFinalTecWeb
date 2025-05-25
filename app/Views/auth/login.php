@@ -29,7 +29,7 @@
                         </div>
                         
                         <div class="d-flex justify-content-between gap-3 mt-4">
-                            <a href="/PROYECTOFINALTECWEB/?action=home" 
+                            <a href="/ProyectoFinalTecWeb/public" 
                                 class="btn btn-regresar text-white flex-grow-1">Regresar</a>
                             <button type="submit" class="btn btn-login text-white flex-grow-1">Ingresar</button>
                         </div>

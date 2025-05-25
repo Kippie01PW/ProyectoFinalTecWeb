@@ -175,4 +175,12 @@ class AlumnoController
         $response->getBody()->write($output); 
         return $response;
     }
-}
+    
+    public function showDashboard(Request $request, Response $response, $args) {
+        ob_start();
+        require_once APP_ROOT . '/Views/alumnos/dashboard.php';
+        $output = ob_get_clean();
+        $response->getBody()->write($output);
+        return $response;
+    }
+    }

@@ -5,7 +5,6 @@
     <title>Mis Cursos</title>
     <link rel="stylesheet" href="../assets/css/style.css"> 
     <style>
-        /* Estilos básicos para que se vea algo ordenado */
         body { font-family: sans-serif; }
         h1, h2 { text-align: center; color: #333; }
         .cursos-container { display: flex; justify-content: space-around; padding: 20px; gap: 20px; }

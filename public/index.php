@@ -16,7 +16,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use App\Controllers\PreferenciasAlumnoController;
 ///Nuevo
 use App\Controllers\CursoController;
-
+use App\Controllers\MaestroController;
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../app/config/config.php';
 
@@ -100,6 +100,19 @@ $app->group('/cursos', function ($group) {
     // Listar cursos por categoría
     $group->get('/categoria/{id}', CursoController::class . ':listarCursos');
 });
+
+$app->get('/maestros/dashboard', function (Request $request, Response $response, $args) {
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    ob_start();
+    require APP_ROOT . '/Views/Base_dashboard.php'; // Tu archivo actual
+    $output = ob_get_clean();
+    $response->getBody()->write($output);
+    return $response;
+})->add($requireMaestro)->add($requireAuth);
+
 
 // --- Fin de Rutas ---
 

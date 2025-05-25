@@ -11,7 +11,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-custom-green py-3">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/ProyectoFinalTecWeb/public/maestros/cursos">
+            <a class="navbar-brand" href="/ProyectoFinalTecWeb/public">
                 <img src="/PROYECTOFINALTECWEB/public/assets/images/NexoLearn_logo_narvar.png"  
                      class="navbar-logo" 
                      alt="Logo Educación ODS">
@@ -27,13 +27,13 @@
             <div class="collapse navbar-collapse justify-content-end" id="navbarMaestro">
                 <ul class="navbar-nav align-items-center">
                     <li class="nav-item mx-2">
-                        <a class="nav-link" href="###">
+                        <a class="nav-link" href="../maestros/dashboard">
                             <i class="bi bi-speedometer2 me-1"></i>
                             Dashboard
                         </a>
                     </li>
                     <li class="nav-item mx-2">
-                        <a class="nav-link" href="###">
+                        <a class="nav-link" href="../clases/">
                             <i class="bi bi-people-fill me-1"></i>
                             Mis Alumnos
                         </a>

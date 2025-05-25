@@ -16,6 +16,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 use App\Controllers\PreferenciasAlumnoController;
 ///Nuevo
 use App\Controllers\CursoController;
+use App\Controllers\ClaseController;
+
 use App\Controllers\MaestroController;
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../app/config/config.php';
@@ -115,8 +117,19 @@ $app->get('/maestros/dashboard', function (Request $request, Response $response,
     return $response;
 })->add($requireMaestro)->add($requireAuth);
 
+// Rutas para Clases (Maestros)
+$app->group('/clases', function ($group) {
+    $group->get('/', \App\Controllers\ClaseController::class . ':showClases');
+    $group->get('/index', \App\Controllers\ClaseController::class . ':showClases');
+    $group->get('/ver/{id}', \App\Controllers\ClaseController::class . ':verClase');
+})->add($requireMaestro)->add($requireAuth);
 
-
+// Rutas API para Clases
+$app->group('/api/clases', function ($group) {
+    $group->post('/crear', \App\Controllers\ClaseController::class . ':crearClase');
+    $group->post('/unirse', \App\Controllers\ClaseController::class . ':unirseClase');
+    $group->get('/estadisticas/{id}', \App\Controllers\ClaseController::class . ':obtenerEstadisticas');
+});
 
 // --- Fin de Rutas ---
 

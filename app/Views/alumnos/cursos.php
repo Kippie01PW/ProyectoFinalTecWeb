@@ -184,5 +184,6 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="/ProyectoFinalTecWeb/public/assets/js/MostrarCursos.js"></script>
+    <script src="/PROYECTOFINALTECWEB/public/assets/js/alumnos.js"></script>
 </body>
 </html>

@@ -20,7 +20,7 @@ class Data_Maestro {
                      JOIN alumno a ON pa.alumno_id = a.id
                      JOIN alumnocurso ac ON a.id = ac.alumno_id
                      JOIN cursos c ON ac.curso_id = c.id
-                     JOIN clases cl ON c.clase_id = cl.id
+                     JOIN clases cl ON ac.clase_id = cl.id
                      WHERE cl.maestro_id = :maestro_id";
 
         try {
@@ -70,7 +70,8 @@ class Data_Maestro {
                 FROM alumno a
                 JOIN alumnocurso ac ON a.id = ac.alumno_id
                 JOIN cursos c ON ac.curso_id = c.id
-                JOIN clases cl ON c.clase_id = cl.id
+                JOIN clases cl ON ac.clase_id = cl.id
+
                 WHERE cl.maestro_id = :maestro_id";
 
         try {
@@ -99,7 +100,8 @@ class Data_Maestro {
         $sql = "SELECT COUNT(DISTINCT ac.alumno_id) AS alumnos_terminados
                 FROM alumnocurso ac
                 JOIN cursos c ON ac.curso_id = c.id
-                JOIN clases cl ON c.clase_id = cl.id
+                JOIN clases cl ON ac.clase_id = cl.id
+
                 WHERE cl.maestro_id = :maestro_id AND ac.estado = 'completado'";
 
         try {
@@ -130,7 +132,8 @@ class Data_Maestro {
         $sql = "SELECT ac.estado, COUNT(*) AS total
                 FROM alumnocurso ac
                 JOIN cursos c ON ac.curso_id = c.id
-                JOIN clases cl ON c.clase_id = cl.id
+                JOIN clases cl ON ac.clase_id = cl.id
+
                 WHERE cl.maestro_id = :maestro_id
                 GROUP BY ac.estado";
 

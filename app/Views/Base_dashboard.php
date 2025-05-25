@@ -38,7 +38,9 @@ $jsHandler = new \App\Controllers\MaestroController($datosPreguntas, $preguntasT
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/dashboard_maestro.js"></script>
+    <script src="/ProyectoFinalTecWeb/public/assets/js/dashboard_maestro.js"></script>
+
+
 
 
 

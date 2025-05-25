@@ -112,6 +112,8 @@ $app->get('/maestros/dashboard', function (Request $request, Response $response,
 })->add($requireMaestro)->add($requireAuth);
 
 
+
+
 // --- Fin de Rutas ---
 
 // 7. Ejecutar la Aplicación

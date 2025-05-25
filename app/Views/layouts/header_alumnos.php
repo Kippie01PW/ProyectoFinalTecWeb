@@ -39,9 +39,10 @@
                     </a>
                 </li>
                 <li class="nav-item mx-2">
-                <a class="nav-link" href="#" id="compartirMiId">
-                    <i class="bi bi-share me-1"></i> Compartir ID
-                </a>
+                     <a class="nav-link" href="/ProyectoFinalTecWeb/public/alumnos/dashboard">
+                        <i class="bi bi-share me-1"></i>
+                        Dashboard
+                    </a>
                 </li>
                     <li class="nav-item dropdown mx-2">
                         <a class="nav-link dropdown-toggle" 

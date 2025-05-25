@@ -26,6 +26,10 @@ class ClaseController {
             $pdo = (new Conexion())->getConexion();
             $claseModel = new ClaseModel($pdo);
             $clases = $claseModel->obtenerClasesPorMaestro($maestro_id);
+            
+            // Obtener cursos y alumnos para el formulario
+            $cursos = $claseModel->obtenerTodosLosCursos();
+            $alumnos = $claseModel->obtenerTodosLosAlumnos();
 
             ob_start();
             require_once APP_ROOT . '/Views/clases/index.php';
@@ -36,6 +40,29 @@ class ClaseController {
         } catch (\Exception $e) {
             $response->getBody()->write('Error al cargar las clases: ' . $e->getMessage());
             return $response->withStatus(500);
+        }
+    }
+
+    /**
+     * API para obtener estadísticas de una clase
+     */
+    public function obtenerEstadisticas(Request $request, Response $response, $args) {
+        $clase_id = $args['id'];
+        
+        try {
+            $pdo = (new Conexion())->getConexion();
+            $claseModel = new ClaseModel($pdo);
+            $estadisticas = $claseModel->obtenerEstadisticasClase($clase_id);
+            
+            $response->getBody()->write(json_encode($estadisticas));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+            
+        } catch (\Exception $e) {
+            $response->getBody()->write(json_encode([
+                'error' => 'Error al obtener estadísticas',
+                'message' => $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
     }
 
@@ -54,6 +81,10 @@ class ClaseController {
 
         $data = $request->getParsedBody();
         $maestro_id = $_SESSION['maestro_id'];
+        
+        // Obtener arrays de cursos y alumnos seleccionados
+        $cursos = isset($data['cursos']) ? $data['cursos'] : [];
+        $alumnos = isset($data['alumnos']) ? $data['alumnos'] : [];
 
         try {
             $pdo = (new Conexion())->getConexion();
@@ -62,13 +93,18 @@ class ClaseController {
             $clase_id = $claseModel->crearClase(
                 $maestro_id,
                 $data['nombre'],
-                $data['descripcion'] ?? null
+                $data['descripcion'] ?? null,
+                $cursos,
+                $alumnos
             );
 
             $response->getBody()->write(json_encode([
                 'success' => true,
                 'clase_id' => $clase_id,
-                'codigo' => $claseModel->obtenerCodigoClase($clase_id)
+                'codigo' => $claseModel->obtenerCodigoClase($clase_id),
+                'cursos_asignados' => count($cursos),
+                'alumnos_asignados' => count($alumnos),
+                'relaciones_creadas' => count($cursos) * count($alumnos) // Total de relaciones alumno-curso
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
 

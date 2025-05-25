@@ -13,20 +13,98 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="nombre" class="form-label">Nombre de la Clase</label>
+                            <label for="nombre" class="form-label">Nombre de la Clase *</label>
                             <input type="text" class="form-control" id="nombre" name="nombre" required>
                         </div>
-                    </div>
-                    <div class="col-md-6">
                         <div class="mb-3">
                             <label for="descripcion" class="form-label">Descripción</label>
-                            <textarea class="form-control" id="descripcion" name="descripcion" rows="2"></textarea>
+                            <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">Cursos a Asignar</label>
+                            <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+                                <div class="mb-2">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="seleccionarTodosCursos()">
+                                        Seleccionar Todos
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="limpiarCursos()">
+                                        Limpiar
+                                    </button>
+                                </div>
+                                <?php if (!empty($cursos)): ?>
+                                    <?php foreach ($cursos as $curso): ?>
+                                        <div class="form-check">
+                                            <input class="form-check-input curso-checkbox" type="checkbox" 
+                                                   name="cursos[]" value="<?= $curso['id'] ?>" 
+                                                   id="curso_<?= $curso['id'] ?>">
+                                            <label class="form-check-label" for="curso_<?= $curso['id'] ?>">
+                                                <small>
+                                                    <strong><?= htmlspecialchars($curso['titulo']) ?></strong>
+                                                    <?php if ($curso['categoria_nombre']): ?>
+                                                        <br><span class="text-muted"><?= htmlspecialchars($curso['categoria_nombre']) ?></span>
+                                                    <?php endif; ?>
+                                                </small>
+                                            </label>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <p class="text-muted">No hay cursos disponibles</p>
+                                <?php endif; ?>
+                            </div>
+                            <small class="text-info">Selecciona los cursos que quieres asignar a esta clase</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <label class="form-label">Alumnos a Asignar</label>
+                            <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+                                <div class="mb-2">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="seleccionarTodosAlumnos()">
+                                        Seleccionar Todos
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="limpiarAlumnos()">
+                                        Limpiar
+                                    </button>
+                                </div>
+                                <?php if (!empty($alumnos)): ?>
+                                    <?php foreach ($alumnos as $alumno): ?>
+                                        <div class="form-check">
+                                            <input class="form-check-input alumno-checkbox" type="checkbox" 
+                                                   name="alumnos[]" value="<?= $alumno['id'] ?>" 
+                                                   id="alumno_<?= $alumno['id'] ?>">
+                                            <label class="form-check-label" for="alumno_<?= $alumno['id'] ?>">
+                                                <small>
+                                                    <strong><?= htmlspecialchars($alumno['nombre']) ?></strong>
+                                                    <br><span class="text-muted"><?= htmlspecialchars($alumno['email']) ?></span>
+                                                </small>
+                                            </label>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <p class="text-muted">No hay alumnos disponibles</p>
+                                <?php endif; ?>
+                            </div>
+                            <small class="text-info">Selecciona los alumnos que quieres inscribir en esta clase</small>
                         </div>
                     </div>
                 </div>
                 
-                <button type="submit" class="btn btn-primary">Crear Clase</button>
-                <button type="reset" class="btn btn-secondary">Limpiar</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Crear Clase
+                </button>
+                <button type="reset" class="btn btn-secondary" onclick="limpiarFormulario()">
+                    <i class="bi bi-arrow-clockwise"></i> Limpiar Todo
+                </button>
+                
+                <!-- Contador de selecciones -->
+                <div class="mt-2">
+                    <small class="text-muted">
+                        <span id="contadorCursos">0 cursos seleccionados</span> | 
+                        <span id="contadorAlumnos">0 alumnos seleccionados</span>
+                    </small>
+                </div>
             </form>
             
             <div id="mensaje" class="mt-3"></div>
@@ -52,6 +130,7 @@
                                 <th>Código</th>
                                 <th>Descripción</th>
                                 <th>Alumnos</th>
+                                <th>Cursos</th>
                                 <th>Creada</th>
                                 <th>Acciones</th>
                             </tr>
@@ -59,7 +138,9 @@
                         <tbody id="tablaClases">
                             <?php foreach ($clases as $clase): ?>
                                 <tr>
-                                    <td><?= htmlspecialchars($clase['nombre']) ?></td>
+                                    <td>
+                                        <strong><?= htmlspecialchars($clase['nombre']) ?></strong>
+                                    </td>
                                     <td>
                                         <code><?= htmlspecialchars($clase['codigo']) ?></code>
                                         <button class="btn btn-sm btn-outline-secondary ms-1" 
@@ -70,6 +151,23 @@
                                     <td><?= htmlspecialchars($clase['descripcion'] ?? 'Sin descripción') ?></td>
                                     <td>
                                         <span class="badge bg-primary"><?= $clase['total_alumnos'] ?></span>
+                                        <?php if (!empty($clase['alumnos'])): ?>
+                                            <br><small class="text-muted">
+                                                <?php foreach ($clase['alumnos'] as $alumno): ?>
+                                                    • <?= htmlspecialchars($alumno['nombre']) ?><br>
+                                                <?php endforeach; ?>
+                                            </small>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success"><?= $clase['total_cursos'] ?></span>
+                                        <?php if (!empty($clase['cursos'])): ?>
+                                            <br><small class="text-muted">
+                                                <?php foreach ($clase['cursos'] as $curso): ?>
+                                                    • <?= htmlspecialchars($curso['titulo']) ?><br>
+                                                <?php endforeach; ?>
+                                            </small>
+                                        <?php endif; ?>
                                     </td>
                                     <td><?= date('d/m/Y', strtotime($clase['created_at'])) ?></td>
                                     <td>
@@ -89,11 +187,91 @@
 </div>
 
 <script>
+// Funciones para manejar selecciones múltiples
+function seleccionarTodosCursos() {
+    const checkboxes = document.querySelectorAll('.curso-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    actualizarContadores();
+}
+
+function limpiarCursos() {
+    const checkboxes = document.querySelectorAll('.curso-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    actualizarContadores();
+}
+
+function seleccionarTodosAlumnos() {
+    const checkboxes = document.querySelectorAll('.alumno-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    actualizarContadores();
+}
+
+function limpiarAlumnos() {
+    const checkboxes = document.querySelectorAll('.alumno-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    actualizarContadores();
+}
+
+function limpiarFormulario() {
+    document.getElementById('formClase').reset();
+    limpiarCursos();
+    limpiarAlumnos();
+    actualizarContadores();
+}
+
+function actualizarContadores() {
+    const cursosSeleccionados = document.querySelectorAll('.curso-checkbox:checked').length;
+    const alumnosSeleccionados = document.querySelectorAll('.alumno-checkbox:checked').length;
+    
+    document.getElementById('contadorCursos').textContent = `${cursosSeleccionados} cursos seleccionados`;
+    document.getElementById('contadorAlumnos').textContent = `${alumnosSeleccionados} alumnos seleccionados`;
+}
+
+// Event listeners para actualizar contadores
+document.addEventListener('DOMContentLoaded', function() {
+    // Agregar listeners a todos los checkboxes
+    document.querySelectorAll('.curso-checkbox, .alumno-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', actualizarContadores);
+    });
+    
+    // Actualizar contadores iniciales
+    actualizarContadores();
+});
+
 // Manejar formulario de crear clase
 document.getElementById('formClase').addEventListener('submit', function(e) {
     e.preventDefault();
     
+    // Validar que al menos se haya puesto un nombre
+    const nombre = document.getElementById('nombre').value.trim();
+    if (!nombre) {
+        document.getElementById('mensaje').innerHTML = 
+            '<div class="alert alert-warning">⚠️ El nombre de la clase es obligatorio</div>';
+        return;
+    }
+    
+    // Mostrar información de lo que se va a crear
+    const cursosSeleccionados = document.querySelectorAll('.curso-checkbox:checked').length;
+    const alumnosSeleccionados = document.querySelectorAll('.alumno-checkbox:checked').length;
+    
+    if (cursosSeleccionados === 0 && alumnosSeleccionados === 0) {
+        const confirmar = confirm('¿Crear clase sin cursos ni alumnos asignados?\n\nPodrás agregarlos después o los alumnos pueden unirse con el código.');
+        if (!confirmar) return;
+    }
+    
     const formData = new FormData(this);
+    
+    // Mostrar mensaje de carga
+    document.getElementById('mensaje').innerHTML = 
+        '<div class="alert alert-info">⏳ Creando clase...</div>';
     
     fetch('/ProyectoFinalTecWeb/public/api/clases/crear', {
         method: 'POST',
@@ -105,17 +283,20 @@ document.getElementById('formClase').addEventListener('submit', function(e) {
         if (data.success) {
             mensaje.innerHTML = `
                 <div class="alert alert-success">
-                    ✅ Clase creada exitosamente. 
-                    <br><strong>Código de la clase: ${data.codigo}</strong>
-                    <br><small>Comparte este código con tus alumnos para que se unan.</small>
+                    ✅ <strong>Clase creada exitosamente!</strong>
+                    <br>📋 <strong>Código de la clase: ${data.codigo}</strong>
+                    <br>📚 <strong>${data.cursos_asignados || 0} cursos asignados</strong>
+                    <br>👥 <strong>${data.alumnos_asignados || 0} alumnos inscritos</strong>
+                    <br>🔗 <strong>${data.relaciones_creadas || 0} relaciones alumno-curso creadas</strong>
+                    <br><small class="text-muted">¡La tabla alumnocurso se llenó automáticamente!</small>
                 </div>
             `;
-            document.getElementById('formClase').reset();
+            limpiarFormulario();
             
             // Recargar la página para mostrar la nueva clase en la tabla
             setTimeout(() => {
                 location.reload();
-            }, 2000);
+            }, 3000);
         } else {
             mensaje.innerHTML = `<div class="alert alert-danger">❌ ${data.error}</div>`;
         }

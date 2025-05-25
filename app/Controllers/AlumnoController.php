@@ -11,7 +11,8 @@ use PDO;
 
 class AlumnoController
 {
-
+    
+    private $datosProgreso;
     /**
      * Ruta: GET /api/alumnos/cursos/asignados
      */
@@ -135,8 +136,7 @@ class AlumnoController
         $output = ob_get_clean(); 
         $response->getBody()->write($output); 
         return $response;
-    }
-    
+    }    
     public function showDashboard(Request $request, Response $response, $args) {
         ob_start();
         require_once APP_ROOT . '/Views/alumnos/dashboard.php';
@@ -144,4 +144,111 @@ class AlumnoController
         $response->getBody()->write($output);
         return $response;
     }
+    public function generarJavaScript() {
+    $etiquetasProgreso = json_encode($this->datosProgreso['etiquetas']);
+    $valoresProgreso = json_encode($this->datosProgreso['valores']);
+
+    return "
+    <script>
+    const datos = {
+        progreso: {
+            etiquetas: {$etiquetasProgreso},
+            valores: {$valoresProgreso}
+        }
+    };
+
+    let chart;
+    let tipoGrafico = 'bar';
+
+    function generarColores(cantidad) {
+        const baseColor = [75, 192, 192];
+        return Array.from({ length: cantidad }, (_, i) => {
+            const factor = 0.5 + (i / cantidad) * 0.5;
+            return `rgba(\${baseColor[0]}, \${baseColor[1]}, \${baseColor[2]}, \${factor})`;
+        });
     }
+
+    function crearGrafico(etiquetas, valores, titulo = '') {
+        const ctx = document.getElementById('grafico').getContext('2d');
+        if (chart) chart.destroy();
+
+        chart = new Chart(ctx, {
+            type: tipoGrafico,
+            data: {
+                labels: etiquetas,
+                datasets: [{
+                    label: titulo,
+                    data: valores,
+                    backgroundColor: generarColores(valores.length),
+                    borderColor: generarColores(valores.length).map(color =>
+                        color.replace(/[\\d\\.]+\\)\$/g, '1)')
+                    ),
+                    borderWidth: 1,
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: tipoGrafico === 'pie' || tipoGrafico === 'doughnut',
+                        position: 'top',
+                        labels: { padding: 20 }
+                    },
+                    datalabels: tipoGrafico !== 'line' ? {
+                        color: '#000',
+                        anchor: 'center',
+                        align: 'center',
+                        formatter: (value, context) => {
+                            const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            return total ? (value / total * 100).toFixed(1) + '%' : '0%';
+                        }
+                    } : false
+                },
+                scales: tipoGrafico !== 'pie' && tipoGrafico !== 'doughnut' ? {
+                    y: { beginAtZero: true }
+                } : {}
+            },
+            plugins: [ChartDataLabels]
+        });
+    }
+
+    function cambiarTipoGrafico() {
+        const tipos = ['bar', 'line', 'doughnut', 'pie'];
+        const index = tipos.indexOf(tipoGrafico);
+        tipoGrafico = tipos[(index + 1) % tipos.length];
+        
+        const datosActuales = chart.data;
+        crearGrafico(datosActuales.labels, datosActuales.datasets[0].data, datosActuales.datasets[0].label);
+    }
+
+    function actualizarGrafico(etiquetas, valores, titulo = '') {
+        if (chart) {
+            chart.data.labels = etiquetas;
+            chart.data.datasets[0].data = valores;
+            chart.data.datasets[0].label = titulo;
+            chart.data.datasets[0].backgroundColor = generarColores(valores.length);
+            chart.data.datasets[0].borderColor = generarColores(valores.length).map(color => 
+                color.replace(/[\\d\\.]+\\)\$/g, '1)')
+            );
+            chart.update();
+        } else {
+            crearGrafico(etiquetas, valores, titulo);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (document.getElementById('Cambiar_Gráfico')) {
+            document.getElementById('Cambiar_Gráfico').addEventListener('click', cambiarTipoGrafico);
+        }
+
+        if (datos.progreso.etiquetas.length > 0) {
+            crearGrafico(datos.progreso.etiquetas, datos.progreso.valores, 'Progreso');
+        }
+    });
+    </script>";
+}
+
+}

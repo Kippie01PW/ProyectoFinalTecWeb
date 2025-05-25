@@ -3,7 +3,7 @@ namespace App\Models;
 use App\Core\Conexion;
 
 
-class MostarCursosModel {
+class MostrarCursosModel {
     private $conn;
 
     public function __construct($connection) {

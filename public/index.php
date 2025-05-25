@@ -78,6 +78,10 @@ $app->group('/api/alumnos', function ($group) {
     $group->get('/cursos/completados', \App\Controllers\AlumnoController::class . ':getCursosCompletados');
     $group->get('/clases', \App\Controllers\AlumnoController::class . ':getMisClases');
     // $group->post('/clases/unirse', \App\Controllers\AlumnoController::class . ':unirseAClase'); // <-- COMENTAREMOS O ELIMINAREMOS ESTA
+
+    // En la sección de rutas API Alumno, reemplazar las líneas existentes:
+    $group->get('/cursos/mostrar/asignados', \App\Controllers\MostrarCursosController::class . ':getCursosAsignados');
+    $group->get('/cursos/mostrar/completados', \App\Controllers\MostrarCursosController::class . ':getCursosCompletados');
 })->add($requireAlumno)->add($requireAuth); 
 
 

@@ -50,7 +50,8 @@ $baseUrl = "/ProyectoFinalTecWeb/public";
                                 <a class="nav-link" href="<?php echo $baseUrl; ?>/alumnos/cursos">Mis Cursos</a>
                             </li>
                             <li class="nav-item me-3">
-                                <a class="nav-link" href="#">Mis Grupos</a> </li>
+                                <a class="nav-link" href="#">Mis Grupos</a> 
+                            </li>
                             <li class="nav-item me-3">
                                 <a class="nav-link" href="#">Mi Aprendizaje</a> </li>
                         <?php endif; ?>

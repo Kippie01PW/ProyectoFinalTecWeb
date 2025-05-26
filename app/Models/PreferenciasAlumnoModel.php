@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 
-use App\Core\Conexion;
+use App\Core\Conexion; // Aún necesitas esta línea para el namespace si no usas Composer para cargarla directamente
 
 class PreferenciasAlumnoModel {
     private $conn;
@@ -11,23 +11,15 @@ class PreferenciasAlumnoModel {
     }
     
     public function guardarPreferencias($alumno_id, $respuestas) {
-        // Mapear las respuestas recibidas a un array ordenado
-        $respuestasOrdenadas = [];
+        $respuestasMapeadas = $this->mapearRespuestasAPreguntasBD($respuestas); // Nuevo método para mapear
         
-        // Ordenar las respuestas por número de pregunta
-        for ($i = 1; $i <= 20; $i++) {
-            $preguntaKey = $this->buscarPregunta($respuestas, $i);
-            if ($preguntaKey) {
-                $respuestasOrdenadas[] = $respuestas[$preguntaKey];
-            } else {
-                throw new \Exception("Falta la respuesta para la pregunta $i");
-            }
+        // Verificar que tenemos exactamente 20 respuestas mapeadas y no nulas
+        if (count($respuestasMapeadas) !== 20 || in_array(null, $respuestasMapeadas, true)) {
+            throw new \Exception("Faltan respuestas o el mapeo es incorrecto. Se esperaban 20 respuestas.");
         }
         
-        // Verificar que tenemos exactamente 20 respuestas
-        if (count($respuestasOrdenadas) !== 20) {
-            throw new \Exception("Se requieren exactamente 20 respuestas, se recibieron " . count($respuestasOrdenadas));
-        }
+        // Extrae los valores en el orden correcto para el SQL
+        $valoresParaBD = array_values($respuestasMapeadas);
         
         // Verificar si el alumno ya tiene preferencias guardadas
         $sqlCheck = "SELECT id FROM preferenciasalumno WHERE alumno_id = ?";
@@ -37,52 +29,67 @@ class PreferenciasAlumnoModel {
         
         if ($exists) {
             // Actualizar preferencias existentes
-            $sql = "UPDATE preferenciasalumno SET 
-                        pregunta1 = ?, pregunta2 = ?, pregunta3 = ?, pregunta4 = ?, pregunta5 = ?,
-                        pregunta6 = ?, pregunta7 = ?, pregunta8 = ?, pregunta9 = ?, pregunta10 = ?,
-                        pregunta11 = ?, pregunta12 = ?, pregunta13 = ?, pregunta14 = ?, pregunta15 = ?,
-                        pregunta16 = ?, pregunta17 = ?, pregunta18 = ?, pregunta19 = ?, pregunta20 = ?
-                    WHERE alumno_id = ?";
+            $setClauses = [];
+            $columnNames = [];
+            for ($i = 1; $i <= 20; $i++) {
+                $setClauses[] = "pregunta{$i} = ?";
+                $columnNames[] = "pregunta{$i}"; // Solo para referencia, no usado directamente en UPDATE SET
+            }
+
+            $sql = "UPDATE preferenciasalumno SET " . implode(', ', $setClauses) . " WHERE alumno_id = ?";
             
             $stmt = $this->conn->prepare($sql);
-            $params = array_merge($respuestasOrdenadas, [$alumno_id]);
+            $params = array_merge($valoresParaBD, [$alumno_id]); // Los valores seguidos del alumno_id
             $stmt->execute($params);
             return $exists['id'];
         } else {
             // Insertar nuevas preferencias
-            $sql = "INSERT INTO preferenciasalumno (
-                        alumno_id,
-                        pregunta1, pregunta2, pregunta3, pregunta4, pregunta5,
-                        pregunta6, pregunta7, pregunta8, pregunta9, pregunta10,
-                        pregunta11, pregunta12, pregunta13, pregunta14, pregunta15,
-                        pregunta16, pregunta17, pregunta18, pregunta19, pregunta20
-                    ) VALUES (
-                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-                    )";
+            $columnNames = ['alumno_id'];
+            $placeholders = ['?'];
+            
+            for ($i = 1; $i <= 20; $i++) {
+                $columnNames[] = "pregunta{$i}";
+                $placeholders[] = "?";
+            }
+            
+            $sql = "INSERT INTO preferenciasalumno (" . implode(', ', $columnNames) . ") VALUES (" . implode(', ', $placeholders) . ")";
             
             $stmt = $this->conn->prepare($sql);
-            $params = array_merge([$alumno_id], $respuestasOrdenadas);
+            $params = array_merge([$alumno_id], $valoresParaBD); // alumno_id primero, luego los valores de las preguntas
             $stmt->execute($params);
             return $this->conn->lastInsertId();
         }
     }
     
-    private function buscarPregunta($respuestas, $numeroPregunta) {
-        // Buscar claves que correspondan al número de pregunta
-        foreach (array_keys($respuestas) as $key) {
-            if (preg_match('/q(\d+)_(\d+)/', $key, $matches)) {
-                $pagina = (int)$matches[1];
-                $preguntaEnPagina = (int)$matches[2];
+    // **NUEVO MÉTODO:** Mapea las respuestas de JS (q_pagina_index) a las columnas de la BD (preguntaN)
+    private function mapearRespuestasAPreguntasBD($respuestasJS) {
+        $mapped = array_fill(1, 20, null); // Inicializa un array con 20 nulos (pregunta1 a pregunta20)
+        $globalQuestionIndex = 0;
+
+        // Itera sobre las páginas y preguntas del formulario para mapear a pregunta1...pregunta20
+        // Esta lógica debe ser consistente con la estructura de $questions en Formulario.php
+        $formStructure = [ // Define la estructura de tu formulario para un mapeo correcto
+            1 => 5, // Página 1 tiene 5 preguntas
+            2 => 5, // Página 2 tiene 5 preguntas
+            3 => 10 // Página 3 tiene 10 preguntas
+        ];
+
+        foreach ($formStructure as $pageNumber => $numQuestionsInPage) {
+            for ($qIndexInPage = 1; $qIndexInPage <= $numQuestionsInPage; $qIndexInPage++) {
+                $globalQuestionIndex++; // Incrementa para mapear a pregunta1, pregunta2, etc.
+                $jsKey = "q{$pageNumber}_{$qIndexInPage}"; // Clave esperada del JS: q1_1, q1_2, q2_1, etc.
                 
-                // Calcular el número de pregunta global
-                $preguntaGlobal = ($pagina - 1) * 5 + $preguntaEnPagina;
-                if ($preguntaGlobal === $numeroPregunta) {
-                    return $key;
+                // Si la respuesta existe en el array de JS, la asigna
+                if (isset($respuestasJS[$jsKey])) {
+                    $mapped[$globalQuestionIndex] = $respuestasJS[$jsKey];
+                } else {
+                    // Si una respuesta no se encuentra, la deja como null.
+                    // Esto causará una excepción en la verificación de count($respuestasMapeadas) !== 20
+                    // si alguna pregunta obligatoria no fue respondida.
                 }
             }
         }
-        return null;
+        return $mapped;
     }
     
     public function obtenerPreferencias($alumno_id) {

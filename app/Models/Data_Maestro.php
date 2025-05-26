@@ -14,33 +14,37 @@ class Data_Maestro {
         $this->maestro_id = $maestro_id;
     }
 
-    private function contarOpciones($pregunta) {
-        $consulta = "SELECT JSON_UNQUOTE(JSON_EXTRACT(pa.$pregunta, '$')) AS opcion
-                     FROM preferenciasalumno pa
-                     JOIN alumno a ON pa.alumno_id = a.id
-                     JOIN alumnocurso ac ON a.id = ac.alumno_id
+private function contarOpciones($pregunta) {
+    $consulta = "SELECT pa.$pregunta AS opcion
+                 FROM preferenciasalumno pa
+                 JOIN alumno a ON pa.alumno_id = a.id
+                 WHERE a.id IN (
+                     SELECT DISTINCT ac.alumno_id
+                     FROM alumnocurso ac
                      JOIN cursos c ON ac.curso_id = c.id
                      JOIN clases cl ON ac.clase_id = cl.id
-                     WHERE cl.maestro_id = :maestro_id";
+                     WHERE cl.maestro_id = :maestro_id
+                 )";
 
-        try {
-            $stmt = $this->conexion->prepare($consulta);
-            $stmt->bindParam(':maestro_id', $this->maestro_id, \PDO::PARAM_INT);
-            $stmt->execute();
+    try {
+        $stmt = $this->conexion->prepare($consulta);
+        $stmt->bindParam(':maestro_id', $this->maestro_id, \PDO::PARAM_INT);
+        $stmt->execute();
 
-            $conteo = [];
-            while ($fila = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-                $opcion = $fila['opcion'];
-                if (!isset($conteo[$opcion])) {
-                    $conteo[$opcion] = 0;
-                }
-                $conteo[$opcion]++;
+        $conteo = [];
+        while ($fila = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $opcion = $fila['opcion'];
+            if (!isset($conteo[$opcion])) {
+                $conteo[$opcion] = 0;
             }
-            return $conteo;
-        } catch (\PDOException $e) {
-            die("Error en consulta contarOpciones: " . $e->getMessage());
+            $conteo[$opcion]++;
         }
+        return $conteo;
+    } catch (\PDOException $e) {
+        die("Error en consulta contarOpciones: " . $e->getMessage());
     }
+}
+
 
     public function getDatosPreguntas() {
         return [
@@ -129,31 +133,43 @@ class Data_Maestro {
     }
 
     public function getDatosProgreso() {
-        $sql = "SELECT ac.estado, COUNT(*) AS total
+    $sql = "SELECT 
+                estado_alumno,
+                COUNT(*) as total
+            FROM (
+                SELECT 
+                    ac.alumno_id,
+                    CASE 
+                        WHEN SUM(ac.estado = 'completado') > 0 THEN 'Completado'
+                        WHEN SUM(ac.estado = 'en_progreso') > 0 THEN 'En_progreso'
+                        ELSE 'Inscrito'
+                    END AS estado_alumno
                 FROM alumnocurso ac
                 JOIN cursos c ON ac.curso_id = c.id
                 JOIN clases cl ON ac.clase_id = cl.id
-
                 WHERE cl.maestro_id = :maestro_id
-                GROUP BY ac.estado";
+                GROUP BY ac.alumno_id
+            ) as progreso_por_alumno
+            GROUP BY estado_alumno";
 
-        try {
-            $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(':maestro_id', $this->maestro_id, \PDO::PARAM_INT);
-            $stmt->execute();
+    try {
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->bindParam(':maestro_id', $this->maestro_id, \PDO::PARAM_INT);
+        $stmt->execute();
 
-            $etiquetas = [];
-            $valores = [];
-            while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-                $etiquetas[] = ucfirst($row['estado']);
-                $valores[] = (int)$row['total'];
-            }
-
-            return ['etiquetas' => $etiquetas, 'valores' => $valores];
-        } catch (\PDOException $e) {
-            die("Error en consulta de progreso: " . $e->getMessage());
+        $etiquetas = [];
+        $valores = [];
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $etiquetas[] = ucfirst($row['estado_alumno']);
+            $valores[] = (int)$row['total'];
         }
+
+        return ['etiquetas' => $etiquetas, 'valores' => $valores];
+    } catch (\PDOException $e) {
+        die("Error en consulta de progreso: " . $e->getMessage());
     }
+}
+
 
     public function cerrarConexion() {
         $this->conexion = null;

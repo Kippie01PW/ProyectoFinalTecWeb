@@ -1,0 +1,162 @@
+.navbar-logo {
+            max-height: 40px;
+            margin-right: 15px;
+        }
+
+.bg-custom-green {
+            background-color: #4CAF50 !important; 
+        }
+
+
+
+.navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            transition: all 0.3s ease;
+        }
+
+.navbar-nav .nav-link:hover {
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+    .hover-green:hover {
+        color: #4CAF50 !important;
+        transition: color 0.3s ease;
+    }
+    
+    .text-custom-green {
+        color: #4CAF50;
+    }
+    
+    .footer-logo {
+        transition: transform 0.3s ease;
+    }
+    
+    .footer-logo:hover {
+        transform: scale(1.05);
+    }
+    
+    .bg-dark {
+        background-color: #1a1a1a !important;
+    }
+
+    .text-muted {
+    color: white !important;
+}
+
+.text-custom-green {
+        color: #4CAF50;
+    }
+    
+    .carousel-item {
+        height: 60vh;
+        min-height: 400px;
+    }
+    
+    .carousel-item img {
+        object-fit: cover;
+        height: 100%;
+        width: 100%;
+    }
+    
+    .list-group-item {
+        border-color: rgba(76, 175, 80, 0.2);
+        padding: 1rem 1.5rem;
+    }
+    
+    .shadow {
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+
+.bg-custom-green {
+    background-color: #4CAF50;
+}
+
+.dropdown-menu {
+    border: 1px solid rgba(76, 175, 80, 0.15);
+}
+
+/*La sección del form de registro*/
+body.register {
+    background: linear-gradient(to right, var(--verde-primario), var(--azul-fondo), var(--amarillo-fondo)) !important;
+}
+
+    :root {
+        --verde-primario: #4CAF50;
+        --azul-titulo-encabezado: #26b1a3;    
+        --naranja-logo: #FF6B35;      
+        --azul-logo: #004E89;         
+        --texto-oscuro: #2D2D2D;  
+        --azul-fondo: #51e7c9; 
+        --amarillo-fondo: #f3ed45;   
+        --verde-hover: #428805;  
+        --rojo-regresar:#ed5f5f; 
+        --amarillo-ingresar: #5597ee; 
+        --rojo-hover-regresar: #ab1919; 
+    }
+
+    .card-registro {
+        border: 2px solid var(--verde-primario);
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .card-header-registro {
+        background: var(--azul-titulo-encabezado);
+        padding: 1.5rem;
+    }
+
+    .titulo-registro {
+        color: white;
+        font-weight: 700;
+        text-align: center;
+        margin: 0;
+    }
+
+    .btn-registro {
+        background: var(--amarillo-ingresar);
+        border: none;
+        padding: 12px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .btn-registro:hover {
+        background: var(--verde-hover);
+        transform: translateY(-2px);
+    }
+
+    .enlace-login {
+        color: var(--azul-logo);
+        font-weight: 500;
+    }
+
+    .enlace-login:hover {
+        color: var(--naranja-logo);
+    }
+
+    .btn-regresar{
+        background: var(--rojo-regresar);
+        border: none;
+        padding: 12px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .btn-regresar:hover {
+        background: var(--rojo-hover-regresar);
+        transform: translateY(-2px);
+    }
+
+    .btn-login{
+        background: var(--amarillo-ingresar);
+        border: none;
+        padding: 12px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .btn-login:hover{
+        background: var(--verde-hover);
+        transform: translateY(-2px);
+    }

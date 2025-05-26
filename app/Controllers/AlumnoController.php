@@ -137,6 +137,7 @@ class AlumnoController
         $response->getBody()->write($output); 
         return $response;
     }    
+    
     public function showDashboard(Request $request, Response $response, $args) {
         ob_start();
         require_once APP_ROOT . '/Views/alumnos/dashboard.php';
@@ -144,6 +145,7 @@ class AlumnoController
         $response->getBody()->write($output);
         return $response;
     }
+
     public function generarJavaScript() {
     $etiquetasProgreso = json_encode($this->datosProgreso['etiquetas']);
     $valoresProgreso = json_encode($this->datosProgreso['valores']);

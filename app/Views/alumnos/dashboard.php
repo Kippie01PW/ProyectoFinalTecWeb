@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -17,7 +16,7 @@
         }
         
         .sidebar {
-            width: 300px;
+            width: 300px; /* Mantenemos el sidebar aunque esté más vacío */
             background: #f8f9fa;
             border-radius: 10px;
             padding: 20px;
@@ -31,10 +30,6 @@
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .profile-section {
-            margin-bottom: 30px;
         }
         
         .profile-header {
@@ -55,49 +50,6 @@
             font-size: 24px;
             font-weight: bold;
             margin-right: 15px;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #333;
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-        
-        .btn {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s;
-        }
-        
-        .btn:hover {
-            background: #0056b3;
-        }
-        
-        .btn-secondary {
-            background: #6c757d;
-        }
-        
-        .btn-secondary:hover {
-            background: #545b62;
         }
         
         .chart-container {
@@ -132,7 +84,7 @@
             opacity: 0.9;
         }
         
-        .alert {
+        .alert { /* Mantenemos estilos de alerta por si el JS los usa, aunque la lógica de perfil se fue */
             padding: 10px;
             border-radius: 5px;
             margin-bottom: 15px;
@@ -150,19 +102,12 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
-        
-        .password-section {
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-            margin-top: 20px;
-        }
     </style>
 </head>
 <body>
     <?php require_once APP_ROOT . '/Views/layouts/header_alumnos.php'; ?>
     
     <div class="dashboard-container">
-        <!-- Sidebar - Perfil -->
         <div class="sidebar">
             <div class="profile-section">
                 <div class="profile-header">
@@ -177,48 +122,14 @@
                 
                 <div id="alertContainer"></div>
                 
-                <!-- Formulario de actualización de perfil -->
-                <form id="perfilForm">
-                    <div class="form-group">
-                        <label for="nombre">Nombre:</label>
-                        <input type="text" id="nombre" name="nombre" 
-                               value="<?php echo htmlspecialchars($perfil['nombre'] ?? ''); ?>" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="email">Correo:</label>
-                        <input type="email" id="email" name="email" 
-                               value="<?php echo htmlspecialchars($perfil['email'] ?? ''); ?>" required>
-                    </div>
-                    
-                    <button type="submit" class="btn">Actualizar Perfil</button>
-                </form>
-                
-                <!-- Sección de contraseña -->
-                <div class="password-section">
-                    <h4>Cambiar Contraseña</h4>
-                    <form id="passwordForm">
-                        <div class="form-group">
-                            <label for="password">Nueva Contraseña:</label>
-                            <input type="password" id="password" name="password" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="confirm_password">Confirmar Contraseña:</label>
-                            <input type="password" id="confirm_password" name="confirm_password" required>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-secondary">Actualizar Contraseña</button>
-                    </form>
-                </div>
+                <p>Tu perfil está configurado para mostrar solo las estadísticas.</p>
+
             </div>
         </div>
         
-        <!-- Contenido Principal -->
         <div class="main-content">
             <h1>¡Bienvenido, <?php echo htmlspecialchars($perfil['nombre'] ?? $_SESSION['username'] ?? 'Alumno'); ?>!</h1>
             
-            <!-- Resumen de estadísticas -->
             <div class="stats-summary">
                 <div class="stat-card">
                     <div class="stat-number" id="totalCursos"><?php echo $estadisticas['total'] ?? 0; ?></div>
@@ -234,7 +145,6 @@
                 </div>
             </div>
             
-            <!-- Gráfica de cursos -->
             <div class="chart-container">
                 <canvas id="cursosChart"></canvas>
             </div>

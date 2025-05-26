@@ -1,12 +1,14 @@
 <?php
 namespace App\Models;
-use App\Core\Conexion;
+use App\Core\Conexion; // Aún necesitamos esta línea para saber dónde está Conexion si la creamos en otro lugar.
+use \PDO; // Importamos PDO
 
 class DashboardModel {
     private $db;
     
-    public function __construct($database) {
-        $this->db = $database;
+    // Modificamos el constructor para que reciba la conexión PDO
+    public function __construct(\PDO $db) { //
+        $this->db = $db; //
     }
     
     /**
@@ -22,10 +24,10 @@ class DashboardModel {
                       WHERE alumno_id = :alumno_id";
             
             $stmt = $this->db->prepare($query);
-            $stmt->bindParam(':alumno_id', $alumno_id, PDO::PARAM_INT);
+            $stmt->bindParam(':alumno_id', $alumno_id, \PDO::PARAM_INT);
             $stmt->execute();
             
-            $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+            $resultado = $stmt->fetch(\PDO::FETCH_ASSOC);
             
             return [
                 'total' => (int)$resultado['total'],
@@ -33,114 +35,13 @@ class DashboardModel {
                 'completados' => (int)$resultado['completados']
             ];
             
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             error_log("Error en getCursosEstadisticas: " . $e->getMessage());
             return [
                 'total' => 0,
                 'asignados' => 0,
                 'completados' => 0
             ];
-        }
-    }
-    
-    /**
-     * Obtiene información del perfil del alumno
-     */
-    public function getPerfilAlumno($usuario_id) {
-        try {
-            $query = "SELECT u.username, u.email, a.nombre 
-                      FROM usuarios u 
-                      INNER JOIN alumno a ON u.id = a.usuario_id 
-                      WHERE u.id = :usuario_id";
-            
-            $stmt = $this->db->prepare($query);
-            $stmt->bindParam(':usuario_id', $usuario_id, PDO::PARAM_INT);
-            $stmt->execute();
-            
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-            
-        } catch (PDOException $e) {
-            error_log("Error en getPerfilAlumno: " . $e->getMessage());
-            return false;
-        }
-    }
-    
-    /**
-     * Actualiza el perfil del usuario
-     */
-    public function actualizarPerfil($usuario_id, $datos) {
-        try {
-            $this->db->beginTransaction();
-            
-            // Actualizar tabla usuarios
-            if (!empty($datos['email'])) {
-                $query = "UPDATE usuarios SET email = :email WHERE id = :usuario_id";
-                $stmt = $this->db->prepare($query);
-                $stmt->bindParam(':email', $datos['email']);
-                $stmt->bindParam(':usuario_id', $usuario_id, PDO::PARAM_INT);
-                $stmt->execute();
-            }
-            
-            // Actualizar tabla alumno
-            if (!empty($datos['nombre'])) {
-                $query = "UPDATE alumno SET nombre = :nombre WHERE usuario_id = :usuario_id";
-                $stmt = $this->db->prepare($query);
-                $stmt->bindParam(':nombre', $datos['nombre']);
-                $stmt->bindParam(':usuario_id', $usuario_id, PDO::PARAM_INT);
-                $stmt->execute();
-            }
-            
-            $this->db->commit();
-            return true;
-            
-        } catch (PDOException $e) {
-            $this->db->rollback();
-            error_log("Error en actualizarPerfil: " . $e->getMessage());
-            return false;
-        }
-    }
-    
-    /**
-     * Actualiza la contraseña del usuario
-     */
-    public function actualizarPassword($usuario_id, $nueva_password) {
-        try {
-            $password_hash = password_hash($nueva_password, PASSWORD_DEFAULT);
-            
-            $query = "UPDATE usuarios SET password_hash = :password_hash WHERE id = :usuario_id";
-            $stmt = $this->db->prepare($query);
-            $stmt->bindParam(':password_hash', $password_hash);
-            $stmt->bindParam(':usuario_id', $usuario_id, PDO::PARAM_INT);
-            
-            return $stmt->execute();
-            
-        } catch (PDOException $e) {
-            error_log("Error en actualizarPassword: " . $e->getMessage());
-            return false;
-        }
-    }
-    
-    /**
-     * Verifica si el email ya existe (para validación)
-     */
-    public function emailExiste($email, $usuario_id_excluir = null) {
-        try {
-            $query = "SELECT COUNT(*) FROM usuarios WHERE email = :email";
-            $params = [':email' => $email];
-            
-            if ($usuario_id_excluir) {
-                $query .= " AND id != :usuario_id";
-                $params[':usuario_id'] = $usuario_id_excluir;
-            }
-            
-            $stmt = $this->db->prepare($query);
-            $stmt->execute($params);
-            
-            return $stmt->fetchColumn() > 0;
-            
-        } catch (PDOException $e) {
-            error_log("Error en emailExiste: " . $e->getMessage());
-            return true; // Por seguridad, asumir que existe
         }
     }
 }

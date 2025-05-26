@@ -201,6 +201,154 @@
     </div>
 </div>
 
+<!-- Sección de Evidencias -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-camera me-2"></i>
+                                Evidencias de Cursos Completados
+                            </h5>
+                            
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="evidencias-contenido">
+                            <div class="text-center p-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                                <p class="mt-2">Cargando evidencias...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Modal para ver evidencia -->
+    <div class="modal fade" id="evidenciaModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Evidencia del Curso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="evidencia-img" class="img-fluid" src="" alt="Evidencia" style="max-height: 500px;">
+                    <div class="mt-3">
+                        <h6 id="evidencia-alumno"></h6>
+                        <p id="evidencia-curso" class="text-muted"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function cargarEvidencias() {
+            document.getElementById('evidencias-contenido').innerHTML = `
+                <div class="text-center p-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-2">Cargando evidencias...</p>
+                </div>
+            `;
+
+            fetch('/ProyectoFinalTecWeb/public/api/clases/evidencias')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.evidencias && data.evidencias.length > 0) {
+                        mostrarEvidencias(data.evidencias);
+                    } else {
+                        mostrarSinEvidencias();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    mostrarErrorEvidencias();
+                });
+        }
+
+        function mostrarEvidencias(evidencias) {
+            const html = `
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Alumno</th>
+                                <th>Curso</th>
+                                <th>Clase</th>
+                                <th>Fecha Completado</th>
+                                <th>Evidencia</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${evidencias.map(evidencia => `
+                                <tr>
+                                    <td><strong>${evidencia.alumno_nombre}</strong></td>
+                                    <td>${evidencia.curso_titulo}</td>
+                                    <td><span class="badge bg-primary">${evidencia.clase_nombre}</span></td>
+                                    <td>${new Date(evidencia.fecha_completado).toLocaleDateString('es-ES')}</td>
+                                    <td>
+                                        <img src="${evidencia.evidencia}" 
+                                             style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer;" 
+                                             onclick="verEvidencia('${evidencia.evidencia}', '${evidencia.alumno_nombre}', '${evidencia.curso_titulo}')"
+                                             alt="Evidencia">
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-3">
+                    <small class="text-muted">Total de evidencias: <strong>${evidencias.length}</strong></small>
+                </div>
+            `;
+            
+            document.getElementById('evidencias-contenido').innerHTML = html;
+        }
+
+        function mostrarSinEvidencias() {
+            document.getElementById('evidencias-contenido').innerHTML = `
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No hay evidencias de cursos completados disponibles.
+                </div>
+            `;
+        }
+
+        function mostrarErrorEvidencias() {
+            document.getElementById('evidencias-contenido').innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Error al cargar las evidencias. 
+                    <button class="btn btn-sm btn-outline-danger ms-2" onclick="cargarEvidencias()">
+                        Intentar de nuevo
+                    </button>
+                </div>
+            `;
+        }
+
+        function verEvidencia(src, alumno, curso) {
+            document.getElementById('evidencia-img').src = src;
+            document.getElementById('evidencia-alumno').textContent = alumno;
+            document.getElementById('evidencia-curso').textContent = curso;
+            
+            const modal = new bootstrap.Modal(document.getElementById('evidenciaModal'));
+            modal.show();
+        }
+
+        // Cargar evidencias al iniciar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarEvidencias();
+        });
+    </script>
+
+
 <script>
 // Funciones para manejar selecciones múltiples
 function seleccionarTodosCursos() {

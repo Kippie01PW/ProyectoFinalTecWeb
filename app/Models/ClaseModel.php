@@ -577,6 +577,46 @@ class ClaseModel {
         $this->crearRelacionesAlumnoCurso($clase_id, $cursos);
     }
 
+
+
+
+
+/**
+ * Obtiene evidencias de cursos completados para un maestro
+ */
+public function obtenerEvidenciasCompletadas($maestro_id) {
+    $sql = "SELECT 
+                a.nombre as alumno_nombre,
+                u.email as alumno_email,
+                c.titulo as curso_titulo,
+                cl.nombre as clase_nombre,
+                ac.evidencia,
+                ac.fecha_completado
+            FROM alumnocurso ac
+            INNER JOIN alumno a ON ac.alumno_id = a.id
+            INNER JOIN usuarios u ON a.usuario_id = u.id
+            INNER JOIN cursos c ON ac.curso_id = c.id
+            INNER JOIN clases cl ON ac.clase_id = cl.id
+            WHERE cl.maestro_id = :maestro_id 
+              AND ac.estado = 'completado' 
+              AND ac.evidencia IS NOT NULL
+            ORDER BY ac.fecha_completado DESC";
+    
+    try {
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':maestro_id' => $maestro_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (\Exception $e) {
+        error_log("Error al obtener evidencias: " . $e->getMessage());
+        return [];
+    }
+}    
+
+
+
+
+
+
     /**
      * Asigna alumnos a una clase y crea las relaciones alumno-curso
      */

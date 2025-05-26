@@ -145,15 +145,27 @@ private function contarOpciones($pregunta) {
         }
     }
 
-    public function getDatosMaestro() {
-        $sql = "SELECT username, email FROM usuarios WHERE id = :maestro_id";
+   public function getDatosMaestro() {
+        // CORRECCIÓN: La consulta debe buscar por maestro_id, no por user_id directamente
+        $sql = "SELECT u.username, u.email 
+                FROM usuarios u 
+                INNER JOIN maestro m ON u.id = m.usuario_id 
+                WHERE m.id = :maestro_id";
 
         try {
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':maestro_id', $this->maestro_id, \PDO::PARAM_INT);
             $stmt->execute();
-            return $stmt->fetch(\PDO::FETCH_ASSOC);
+            
+            $resultado = $stmt->fetch(\PDO::FETCH_ASSOC);
+            
+            // Debug: verificar qué devuelve la consulta
+            error_log("getDatosMaestro - Maestro ID: " . $this->maestro_id);
+            error_log("getDatosMaestro - Resultado: " . json_encode($resultado));
+            
+            return $resultado;
         } catch (\PDOException $e) {
+            error_log("Error al obtener datos del maestro: " . $e->getMessage());
             die("Error al obtener datos del maestro: " . $e->getMessage());
         }
     }

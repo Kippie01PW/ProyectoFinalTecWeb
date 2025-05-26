@@ -1,6 +1,6 @@
 <?php 
 
-
+include __DIR__ . '/layouts/header_maestro.php';
 
 require_once __DIR__ . '/../Models/Data_Maestro.php';
 require_once __DIR__ . '/../Controllers/MaestroController.php';
@@ -49,7 +49,7 @@ $jsHandler = new \App\Controllers\MaestroController($datosPreguntas, $preguntasT
     <script src="/ProyectoFinalTecWeb/public/assets/js/dashboard_maestro.js"></script>
 
     <?php 
-    include __DIR__ . '/layouts/header_maestro.php';
+    include __DIR__ . '/layouts/footer.php'; 
     ?>
 </head>
 <body>

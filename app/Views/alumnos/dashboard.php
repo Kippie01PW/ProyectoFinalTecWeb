@@ -248,6 +248,7 @@
     </div>
     
     <script src="../assets/js/dashboard_alumno.js"></script>
+    <script src="/PROYECTOFINALTECWEB/public/assets/js/botonID.js"></script>
     
     <?php require_once APP_ROOT . '/Views/layouts/footer.php'; ?>
 </body>

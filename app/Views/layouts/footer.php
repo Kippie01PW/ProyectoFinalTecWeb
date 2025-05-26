@@ -23,7 +23,7 @@
             </div>
 
             <div class="col-md-4 mb-4 text-center">
-                <a href="#" class="d-inline-block">
+                <a href="/ProyectoFinalTecWeb/public" class="d-inline-block">
                     <img src="/PROYECTOFINALTECWEB/public/assets/images/NexoLearn_logo.png" 
                          alt="Logo de NexoLearn" 
                          class="footer-logo img-fluid"

@@ -144,13 +144,13 @@ $jsHandler = new \App\Controllers\MaestroController($datosPreguntas, $preguntasT
                                 </p>
                                 <div class="row">
                                     <div class="col-6 mt-3">
-                                        <small class="text-muted">
+                                        <small>
                                             <strong>Tipos de gráfico disponibles:</strong><br>
                                             • Barras<br> • Línea<br> • Dona<br> • Circular
                                         </small>
                                     </div>
                                     <div class="col-6 mt-3">
-                                        <small class="text-muted">
+                                        <small>
                                             <strong>Datos disponibles:</strong><br>
                                             • Respuestas del formulario<br> • Progreso de alumnos<br>
                                         </small>

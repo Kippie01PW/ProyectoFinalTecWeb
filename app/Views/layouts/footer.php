@@ -5,7 +5,7 @@
         <div class="row">
 
             <div class="col-md-4 mb-4">
-                <h5 class="text-custom-green mb-3">Legalidad</h5>
+                <h5 class="text-custom-green mb-3">Enlaces relevantes</h5>
                 <ul class="list-unstyled">
                     <li class="mb-2">
                         <a href="https://www.pexels.com/license/" class="text-white text-decoration-none hover-green" target="_blank" rel="noopener noreferrer">

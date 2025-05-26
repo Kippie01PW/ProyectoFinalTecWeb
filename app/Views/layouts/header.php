@@ -47,12 +47,8 @@ $baseUrl = "/ProyectoFinalTecWeb/public";
 
                         <?php if ($_SESSION['role'] === 'alumno') : ?>
                             <li class="nav-item me-3">
-                                <a class="nav-link" href="<?php echo $baseUrl; ?>/alumnos/cursos">Mis Cursos</a>
+                                <a class="nav-link btn btn-outline-light" href="<?php echo $baseUrl; ?>/alumnos/cursos">Mis Cursos</a>
                             </li>
-                            <li class="nav-item me-3">
-                                <a class="nav-link" href="#">Mis Grupos</a> </li>
-                            <li class="nav-item me-3">
-                                <a class="nav-link" href="#">Mi Aprendizaje</a> </li>
                         <?php endif; ?>
 
                         <?php if ($_SESSION['role'] === 'maestro') : ?>
@@ -61,7 +57,7 @@ $baseUrl = "/ProyectoFinalTecWeb/public";
                         <?php endif; ?>
 
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link btn btn-outline-light dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-person-circle me-1"></i>
                                 <?php echo htmlspecialchars($_SESSION['username']); ?>
                             </a>
@@ -72,11 +68,12 @@ $baseUrl = "/ProyectoFinalTecWeb/public";
                             </ul>
                         </li>
 
+
                     <?php else : ?>
                         <?php // --- Usuario SIN Sesión Iniciada --- ?>
 
                         <li class="nav-item me-3">
-                            <a class="nav-link" href="<?php echo $baseUrl; ?>/login">
+                            <a class="nav-link btn btn-outline-light" href="<?php echo $baseUrl; ?>/login">
                                 <i class="bi bi-box-arrow-in-right me-1"></i>
                                 Iniciar Sesión
                             </a>

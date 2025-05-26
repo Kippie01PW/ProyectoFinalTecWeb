@@ -58,9 +58,10 @@ function mostrarCursosAsignados(cursos) {
     cursos.forEach(function(curso) {
         const fila = `
             <tr>
-                <td>${curso.titulo}</td>
+                <td><strong>${curso.titulo}</strong></td>
                 <td>${curso.descripcion || 'Sin descripción'}</td>
-                <td>${curso.categoria || 'Sin categoría'}</td>
+                <td><span class="badge">${curso.categoria || 'Sin categoría'}</span></td>
+                <td><span class="badge">${curso.clase_nombre || 'Sin clase'}</span></td>
                 <td>
                     ${curso.enlace_externo ? 
                         `<a href="${curso.enlace_externo}" target="_blank" class="btn-primary">Ir al Curso</a>` : 
@@ -68,9 +69,11 @@ function mostrarCursosAsignados(cursos) {
                     }
                 </td>
                 <td>
-                    <button onclick="mostrarModalEvidencia(${curso.asignacion_id})" class="btn-success">
-                        Enviar Evidencia
-                    </button>
+                    <div class="acciones-btn">
+                        <button onclick="mostrarModalEvidencia(${curso.asignacion_id})" class="btn-success">
+                            Enviar Evidencia
+                        </button>
+                    </div>
                 </td>
             </tr>
         `;
@@ -87,11 +90,11 @@ function mostrarCursosCompletados(cursos) {
         
         const fila = `
             <tr>
-                <td>${curso.titulo}</td>
+                <td><strong>${curso.titulo}</strong></td>
                 <td>${fechaCompletado}</td>
                 <td>
                     ${curso.evidencia ? 
-                        `<a href="${curso.evidencia}" target="_blank" class="btn-info">Ver Evidencia</a>` : 
+                        `<a href="${curso.evidencia}" target="_blank" class="btn-info">Ver</a>` : 
                         '<span class="text-muted">Sin evidencia</span>'
                     }
                 </td>
@@ -105,7 +108,10 @@ function mostrarModalEvidencia(asignacionId) {
     const modal = `
         <div id="modal-evidencia" class="modal-overlay">
             <div class="modal-content">
-                <h3>Subir Evidencia</h3>
+                <h3> Subir Evidencia del Curso</h3>
+                <p style="text-align: center; color: #6c757d; margin-bottom: 20px;">
+                    Sube una imagen como evidencia de haber completado el curso
+                </p>
                 <form id="form-evidencia" enctype="multipart/form-data">
                     <input type="hidden" id="asignacion_id" value="${asignacionId}">
                     <div class="form-group">
@@ -114,8 +120,8 @@ function mostrarModalEvidencia(asignacionId) {
                         <small>Solo se permiten archivos de imagen (JPEG, PNG, GIF, WebP)</small>
                     </div>
                     <div class="form-buttons">
-                        <button type="submit" class="btn-primary">Subir Evidencia</button>
-                        <button type="button" onclick="cerrarModal()" class="btn-secondary">Cancelar</button>
+                        <button type="submit" class="btn-success"> Subir Evidencia</button>
+                        <button type="button" onclick="cerrarModal()" class="btn-secondary"> Cancelar</button>
                     </div>
                 </form>
             </div>
@@ -143,6 +149,11 @@ function subirEvidencia() {
     formData.append('evidencia', fileInput.files[0]);
     formData.append('asignacion_id', asignacionId);
     
+    // Cambiar el botón para mostrar que se está subiendo
+    const submitBtn = document.querySelector('#form-evidencia button[type="submit"]');
+    submitBtn.innerHTML = 'Subiendo...';
+    submitBtn.disabled = true;
+    
     $.ajax({
         url: '/ProyectoFinalTecWeb/public/api/alumnos/cursos/evidencia',
         type: 'POST',
@@ -157,12 +168,16 @@ function subirEvidencia() {
                 cargarCursosAsignados();
                 cargarCursosCompletados();
             } else {
-                alert('Error: ' + response.error);
+                alert(' Error: ' + response.error);
+                submitBtn.innerHTML = 'Subir Evidencia';
+                submitBtn.disabled = false;
             }
         },
         error: function(xhr, status, error) {
             console.error('Error al subir evidencia:', error);
             alert('Error al subir la evidencia');
+            submitBtn.innerHTML = 'Subir Evidencia';
+            submitBtn.disabled = false;
         }
     });
 }

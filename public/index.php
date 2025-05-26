@@ -67,7 +67,7 @@ $app->get('/', function (Request $request, Response $response, $args) {
 $app->group('/alumnos', function ($group) {
    $group->get('/dashboard', \App\Controllers\AlumnoController::class . ':showDashboard'); 
    
-    //$group->get('/dashboard', \App\Controllers\DashboardController::class . ':index');
+    
     $group->get('/cursos', \App\Controllers\AlumnoController::class . ':showCursosPage');
     //NUEVO
     $group->get('/preferencias/formulario', \App\Controllers\PreferenciasAlumnoController::class . ':showFormulario');
@@ -76,8 +76,7 @@ $app->group('/alumnos', function ($group) {
 
 
     $group->get('/dashboard/estadisticas', \App\Controllers\DashboardController::class . ':getEstadisticas');
-    $group->post('/dashboard/actualizar-perfil', \App\Controllers\DashboardController::class . ':actualizarPerfil');
-    $group->post('/dashboard/actualizar-password', \App\Controllers\DashboardController::class . ':actualizarPassword');
+
 })->add($requireAlumno)->add($requireAuth); 
 
 // Rutas API Alumno 

@@ -118,6 +118,7 @@ $currentSection = $questions[$page];
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="/ProyectoFinalTecWeb/public/assets/js/formulario.js"></script>
+<script src="/PROYECTOFINALTECWEB/public/assets/js/botonID.js"></script>
 </body>
 </html>
 <?php include __DIR__ . '/layouts/footer.php';  ?>

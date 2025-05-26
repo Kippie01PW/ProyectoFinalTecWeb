@@ -48,9 +48,8 @@ $jsHandler = new \App\Controllers\MaestroController($datosPreguntas, $preguntasT
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/ProyectoFinalTecWeb/public/assets/js/dashboard_maestro.js"></script>
 
-    <?php 
-    include __DIR__ . '/layouts/footer.php'; 
-    ?>
+
+
 </head>
 <body>
 
@@ -207,8 +206,9 @@ $dashboard->cerrarConexion();
 ?>
 
 </body>
+
+</html>
+
 <?php 
     include __DIR__ . '/layouts/footer.php'; 
 ?>
-</html>
-

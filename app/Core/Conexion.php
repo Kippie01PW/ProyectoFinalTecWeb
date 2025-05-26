@@ -3,6 +3,7 @@ namespace App\Core;
 
 class Conexion {
     private $conect;
+   
 
     public function __construct() {
         $connectionString = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4";
@@ -17,6 +18,9 @@ class Conexion {
     public function getConexion() {
         return $this->conect;
     }
+
+
+
 }
 
 ?>

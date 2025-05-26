@@ -13,13 +13,13 @@ $(document).ready(function () {
     
     function cargarCursosAsignados() {
         $.ajax({
-            url: baseUrl + "/api/alumnos/cursos/asignados", // URL de tu API
+            url: baseUrl + "/api/alumnos/cursos/asignados", 
             method: 'GET',
             dataType: 'json',
             success: function(cursos) {
-                $('#loading-asignados').hide(); // Oculta "Cargando..."
+                $('#loading-asignados').hide(); 
                 const tbody = $('#tabla-asignados tbody');
-                tbody.empty(); // Limpia la tabla por si acaso
+                tbody.empty(); 
 
                 if (cursos.length > 0) {
                     cursos.forEach(function(curso) {
@@ -32,8 +32,7 @@ $(document).ready(function () {
                             </tr>
                         `);
                     });
-                    $('#tabla-asignados').show(); // Muestra la tabla
-                } else {
+                    $('#tabla-asignados').show(); 
                     $('#loading-asignados').html('No tienes cursos asignados.').show();
                 }
             },
@@ -176,7 +175,7 @@ $(document).ready(function () {
         });
     }
 
-    // Manejar el clic del botón
+
     $('#btnEnviar').on('click', function (e) {
         e.preventDefault();
 
@@ -195,7 +194,6 @@ $(document).ready(function () {
         }
     });
 
-    // Cargar datos guardados al cargar la página
     function cargarDatosGuardados() {
         const datosGuardados = JSON.parse(sessionStorage.getItem('preferenciasFormulario') || '{}');
 

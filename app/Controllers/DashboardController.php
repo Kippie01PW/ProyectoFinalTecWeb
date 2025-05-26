@@ -5,39 +5,34 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Core\Conexion;
 use App\Models\DashboardModel;
+use \PDO;
+use \Exception;
 
-require_once __DIR__ . '/../Models/DashboardModel.php';
+// require_once __DIR__ . '/../Models/DashboardModel.php'; // Esta línea ya no es necesaria si usas Composer autoload
 
 class DashboardController {
     private $dashboardModel;
-    
-    public function __construct($database) {
-        $this->dashboardModel = new DashboardModel($database);
+    private $db; // Añadimos una propiedad para la conexión PDO si la necesitamos directamente
+
+    // Modificamos el constructor para que también cree la conexión
+    public function __construct() { //
+        $conexion = new Conexion(); // Creamos una nueva instancia de Conexion
+        $this->db = $conexion->getConexion(); // Obtenemos la conexión PDO real
+        $this->dashboardModel = new DashboardModel($this->db); // Pasamos la conexión al modelo
     }
     
     /**
-     * Muestra el dashboard principal del alumno
+     * Muestra el dashboard principal del alumno con estadísticas
      */
-    public function index() {
+    public function index(Request $request, Response $response, $args) {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'alumno') {
-            header('Location: /ProyectoFinalTecWeb/public/login');
-            exit;
+            return $response->withHeader('Location', '/ProyectoFinalTecWeb/public/login')->withStatus(302);
         }
         
         $usuario_id = $_SESSION['user_id'];
         
-        // Obtener información del perfil
-        $perfil = $this->dashboardModel->getPerfilAlumno($usuario_id);
-        
-        if (!$perfil) {
-            $_SESSION['error'] = 'Error al cargar información del perfil';
-            $perfil = [
-                'username' => $_SESSION['username'] ?? '',
-                'email' => '',
-                'nombre' => ''
-            ];
-        }
-        
+        $nombreUsuario = $_SESSION['username'] ?? 'Alumno';
+
         // Obtener ID del alumno para las estadísticas
         $alumno_id = $this->getAlumnoId($usuario_id);
         
@@ -46,164 +41,38 @@ class DashboardController {
             $estadisticas = $this->dashboardModel->getCursosEstadisticas($alumno_id);
         }
         
-        // Cargar la vista
         $data = [
-            'perfil' => $perfil,
+            'perfil' => ['nombre' => $nombreUsuario],
             'estadisticas' => $estadisticas
         ];
         
+        ob_start();
         $this->loadView('dashboard/alumno', $data);
+        $output = ob_get_clean();
+        $response->getBody()->write($output);
+        return $response;
     }
     
     /**
      * API endpoint para obtener estadísticas de cursos (JSON)
      */
-    public function getEstadisticas() {
-        header('Content-Type: application/json');
-        
+    public function getEstadisticas(Request $request, Response $response, $args) {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'alumno') {
-            http_response_code(401);
-            echo json_encode(['error' => 'No autorizado']);
-            return;
+            $response->getBody()->write(json_encode(['error' => 'No autorizado']));
+            return $response->withStatus(401);
         }
         
         $usuario_id = $_SESSION['user_id'];
         $alumno_id = $this->getAlumnoId($usuario_id);
         
         if (!$alumno_id) {
-            http_response_code(404);
-            echo json_encode(['error' => 'Alumno no encontrado']);
-            return;
+            $response->getBody()->write(json_encode(['error' => 'Alumno no encontrado']));
+            return $response->withStatus(404);
         }
         
         $estadisticas = $this->dashboardModel->getCursosEstadisticas($alumno_id);
-        echo json_encode($estadisticas);
-    }
-    
-    /**
-     * Actualiza el perfil del usuario
-     */
-    public function actualizarPerfil() {
-        header('Content-Type: application/json');
-        
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'alumno') {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'No autorizado']);
-            return;
-        }
-        
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
-            return;
-        }
-        
-        $input = json_decode(file_get_contents('php://input'), true);
-        $usuario_id = $_SESSION['user_id'];
-        
-        // Validaciones
-        $errores = [];
-        
-        if (empty($input['nombre'])) {
-            $errores[] = 'El nombre es obligatorio';
-        }
-        
-        if (empty($input['email'])) {
-            $errores[] = 'El email es obligatorio';
-        } elseif (!filter_var($input['email'], FILTER_VALIDATE_EMAIL)) {
-            $errores[] = 'El email no es válido';
-        } elseif ($this->dashboardModel->emailExiste($input['email'], $usuario_id)) {
-            $errores[] = 'Este email ya está en uso';
-        }
-        
-        if (!empty($errores)) {
-            echo json_encode([
-                'success' => false,
-                'message' => implode(', ', $errores)
-            ]);
-            return;
-        }
-        
-        // Actualizar perfil
-        $datos = [
-            'nombre' => trim($input['nombre']),
-            'email' => trim($input['email'])
-        ];
-        
-        if ($this->dashboardModel->actualizarPerfil($usuario_id, $datos)) {
-            // Actualizar sesión
-            $_SESSION['username'] = $datos['nombre'];
-            
-            echo json_encode([
-                'success' => true,
-                'message' => 'Perfil actualizado correctamente'
-            ]);
-        } else {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Error al actualizar el perfil'
-            ]);
-        }
-    }
-    
-    /**
-     * Actualiza la contraseña del usuario
-     */
-    public function actualizarPassword() {
-        header('Content-Type: application/json');
-        
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'alumno') {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'message' => 'No autorizado']);
-            return;
-        }
-        
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
-            return;
-        }
-        
-        $input = json_decode(file_get_contents('php://input'), true);
-        $usuario_id = $_SESSION['user_id'];
-        
-        // Validaciones
-        if (empty($input['password'])) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'La contraseña es obligatoria'
-            ]);
-            return;
-        }
-        
-        if (strlen($input['password']) < 6) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'La contraseña debe tener al menos 6 caracteres'
-            ]);
-            return;
-        }
-        
-        if ($input['password'] !== $input['confirm_password']) {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Las contraseñas no coinciden'
-            ]);
-            return;
-        }
-        
-        // Actualizar contraseña
-        if ($this->dashboardModel->actualizarPassword($usuario_id, $input['password'])) {
-            echo json_encode([
-                'success' => true,
-                'message' => 'Contraseña actualizada correctamente'
-            ]);
-        } else {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Error al actualizar la contraseña'
-            ]);
-        }
+        $response->getBody()->write(json_encode($estadisticas));
+        return $response->withHeader('Content-Type', 'application/json');
     }
     
     /**
@@ -211,12 +80,14 @@ class DashboardController {
      */
     private function getAlumnoId($usuario_id) {
         try {
+            // Usamos la conexión que ya creamos en el constructor del controlador
+            $db = $this->db; 
             $query = "SELECT id FROM alumno WHERE usuario_id = :usuario_id";
-            $stmt = $this->dashboardModel->db->prepare($query);
-            $stmt->bindParam(':usuario_id', $usuario_id, PDO::PARAM_INT);
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':usuario_id', $usuario_id, \PDO::PARAM_INT);
             $stmt->execute();
             
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $result = $stmt->fetch(\PDO::FETCH_ASSOC);
             return $result ? $result['id'] : null;
             
         } catch (Exception $e) {
@@ -230,7 +101,7 @@ class DashboardController {
      */
     private function loadView($view, $data = []) {
         extract($data);
-        $viewPath = __DIR__ . '/../Views/' . $view . '.php';
+        $viewPath = APP_ROOT . '/Views/' . $view . '.php'; 
         
         if (file_exists($viewPath)) {
             include $viewPath;

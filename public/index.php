@@ -142,6 +142,8 @@ $app->group('/api/clases', function ($group) {
     $group->get('/estadisticas/{id}', \App\Controllers\ClaseController::class . ':obtenerEstadisticas');
     $group->get('/detalles/{id}', \App\Controllers\ClaseController::class . ':obtenerDetalles');
     $group->post('/actualizar/{id}', \App\Controllers\ClaseController::class . ':actualizarClase');  // ← NUEVA
+
+      $group->get('/evidencias', \App\Controllers\ClaseController::class . ':obtenerEvidencias');
 });
 
 // --- Fin de Rutas ---

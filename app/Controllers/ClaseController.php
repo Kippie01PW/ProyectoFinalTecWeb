@@ -379,6 +379,51 @@ class ClaseController {
         }
     }
 
+
+
+
+
+/**
+ * API para obtener evidencias de cursos completados
+ */
+public function obtenerEvidencias(Request $request, Response $response, $args) {
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'maestro') {
+        $response->getBody()->write(json_encode(['error' => 'No autorizado']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(401);
+    }
+
+    try {
+        $pdo = (new \App\Core\Conexion())->getConexion();
+        $claseModel = new \App\Models\ClaseModel($pdo);
+        
+        $evidencias = $claseModel->obtenerEvidenciasCompletadas($_SESSION['maestro_id']);
+        
+        $response->getBody()->write(json_encode([
+            'success' => true,
+            'evidencias' => $evidencias
+        ]));
+        return $response->withHeader('Content-Type', 'application/json');
+        
+    } catch (\Exception $e) {
+        $response->getBody()->write(json_encode([
+            'success' => false,
+            'error' => $e->getMessage()
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+    }
+}
+
+
+
+
+
+
+
+    
     /**
      * Muestra formulario para unirse a una clase (para alumnos)
      */

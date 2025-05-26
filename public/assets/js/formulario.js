@@ -1,17 +1,14 @@
+// formulario.js
 $(document).ready(function() {
     const baseUrl = "/ProyectoFinalTecWeb/public";
 
-   //QUITA EL INCISO A)
+    // Modificado: Ahora simplemente devuelve el valor del input,
+    // que debe ser el texto de la opción gracias al cambio en Formulario.php
     function getTextoLabel(input) {
-        const label = document.querySelector(`label[for="${input.id}"]`);
-        if (!label) return '';
-
-        let texto = label.textContent.trim();
-        texto = texto.replace(/^[a-z]\)\s*/, '');
-        return texto;
+        return input.value;
     }
 
-//VALIDACIONES
+    // VALIDACIONES
     function validarFormulario() {
         const preguntas = document.querySelectorAll('form .mb-3');
         let isValid = true;
@@ -53,7 +50,7 @@ $(document).ready(function() {
             const nombreRaw = input.name;
             const nombre = nombreRaw.replace(/\[\]$/, '');
 
-            if (preguntasProcesadas.has(nombre)) return;
+            if (preguntasProcesadas.has(nombre)) return; // Evita procesar la misma pregunta más de una vez por su nombre
 
             const inputsMismoNombre = document.querySelectorAll(`[name="${nombreRaw}"]`);
             let valores = [];
@@ -83,14 +80,19 @@ $(document).ready(function() {
         return respuestas;
     }
 
-  
     function enviarPreferencias() {
         const todasLasRespuestas = JSON.parse(sessionStorage.getItem('preferenciasFormulario') || '{}');
 
         console.log("Todas las respuestas a enviar:", todasLasRespuestas);
 
+        // Se esperan 20 respuestas en total (5 por sección, 3 secciones = 15 preguntas de la parte I y II, 10 de la parte II)
+        // Ojo: tus preguntas son:
+        // Pág 1: 5 preguntas
+        // Pág 2: 5 preguntas
+        // Pág 3: 10 preguntas
+        // Total = 20 preguntas. Tu chequeo de `numRespuestas < 20` es correcto si todas las preguntas de todas las páginas se guardan antes del envío final.
         const numRespuestas = Object.keys(todasLasRespuestas).length;
-        if (numRespuestas < 20) {
+        if (numRespuestas < 20) { // El número 20 debe coincidir con el total de preguntas de todas las páginas
             alert(`Faltan respuestas. Se encontraron ${numRespuestas} de 20 esperadas.`);
             return;
         }
@@ -101,19 +103,14 @@ $(document).ready(function() {
             dataType: "json",
             data: { respuestas: todasLasRespuestas },
             success: function(data) {
-            if (data.success) {
-
-                $('#mensajeEnvio').removeClass('d-none').text('Hemos registrado tus respuestas correctamente :). Te recomendamos contestar el formulario solo una vez pero puedes volver a responderlo.');
-
-                $(window).scrollTop($('#mensajeEnvio').offset().top - 20);
-
-                sessionStorage.removeItem('preferenciasFormulario');
-
-            }else {
-                            alert("Error al guardar las preferencias: " + (data.error || 'Error desconocido'));
+                if (data.success) {
+                    $('#mensajeEnvio').removeClass('d-none').text('Hemos registrado tus respuestas correctamente :). Te recomendamos contestar el formulario solo una vez pero puedes volver a responderlo.');
+                    $(window).scrollTop($('#mensajeEnvio').offset().top - 20);
+                    sessionStorage.removeItem('preferenciasFormulario');
+                } else {
+                    alert("Error al guardar las preferencias: " + (data.error || 'Error desconocido'));
                 }
             },
-
             error: function(jqXHR, textStatus, errorThrown) {
                 console.error("Error AJAX:", textStatus, errorThrown);
                 console.error("Respuesta del servidor:", jqXHR.responseText);
@@ -129,15 +126,16 @@ $(document).ready(function() {
             return false;
         }
 
+        // Guarda las respuestas de la página actual antes de avanzar o enviar
+        guardarDatosTemporales(); 
+
         const btnText = $(this).text().trim();
 
         if (btnText === "Enviar") {
-            guardarDatosTemporales();
             enviarPreferencias();
         } else {
-            guardarDatosTemporales();
             const form = document.getElementById('formPreferencias');
-            form.submit();
+            form.submit(); // Esto envía el formulario y recarga la página a la siguiente
         }
     });
 
@@ -145,7 +143,7 @@ $(document).ready(function() {
         const datosGuardados = JSON.parse(sessionStorage.getItem('preferenciasFormulario') || '{}');
 
         Object.keys(datosGuardados).forEach(nombre => {
-            const valor = datosGuardados[nombre];
+            const valor = datosGuardados[nombre]; // El valor guardado (ej: "Ciencias")
             const inputs = document.querySelectorAll(`[name="${nombre}"], [name="${nombre}[]"]`);
 
             if (inputs.length > 0) {
@@ -160,11 +158,13 @@ $(document).ready(function() {
                     }
 
                     inputs.forEach(input => {
-                        input.checked = valores.includes(input.value);
+                        // Compara el valor del input (ej: "Ciencias") con el valor guardado (ej: "Ciencias")
+                        input.checked = valores.includes(input.value); 
                     });
                 } else if (tipoInput === 'radio') {
                     inputs.forEach(input => {
-                        input.checked = input.value === valor;
+                        // Compara el valor del input (ej: "Ciencias") con el valor guardado (ej: "Ciencias")
+                        input.checked = input.value === valor; 
                     });
                 } else {
                     inputs[0].value = valor;
@@ -173,11 +173,13 @@ $(document).ready(function() {
         });
     }
 
+    // Cargar datos al cargar la página para restaurar las selecciones
     cargarDatosGuardados();
-        // Mostrar mensaje en el dashboard si existe en sessionStorage
+
+    // Mostrar mensaje en el dashboard si existe en sessionStorage (no relacionado con este formulario directamente)
     const mensaje = sessionStorage.getItem('mensajeDashboard');
     if (mensaje) {
-        const contenedor = $('#mensajeDashboard');
+        const contenedor = $('#mensajeDashboard'); // Asegúrate de tener un #mensajeDashboard en la vista del dashboard si lo necesitas
         if (contenedor.length > 0) {
             contenedor.text(mensaje).css({
                 'display': 'block',
@@ -189,4 +191,3 @@ $(document).ready(function() {
         sessionStorage.removeItem('mensajeDashboard');
     }
 });
-

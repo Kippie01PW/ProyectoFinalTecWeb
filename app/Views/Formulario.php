@@ -1,4 +1,5 @@
 <?php
+// Formulario.php
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $totalPages = 3;
 
@@ -6,7 +7,7 @@ $questions = [
   1 => [
     'title' => 'I. Intereses Académicos y Personales (Parte I)',
     'questions' => [
-      '¿Qué área del conocimiento te interesa más?' => ['Ciencias', 'Matemáticas', 'Lenguaje y comunicación', 'Ciencias sociales', 'Tecnología y programación', 'Arte y creatividad'],
+      '¿Qué área del conocimiento te interesa más?' => ['Ciencias', 'Matemáticas', 'Lenguaje y comunicación', 'Ciencias sociales', 'Tecnología y programación', 'Arte y creatividad'], // <--- CORREGIDO AQUÍ
       '¿En qué área sueles obtener mejores calificaciones?' => ['Ciencias', 'Matemáticas', 'Lenguaje y comunicación', 'Ciencias sociales', 'Tecnología y programación', 'Arte'],
       '¿Te gusta más trabajar solo o en equipo?' => ['Solo', 'En equipo', 'Depende del tipo de actividad'],
       '¿Qué prefieres hacer?' => ['Resolver problemas numéricos o lógicos', 'Escribir textos o historias', 'Dibujar o crear cosas manualmente', 'Investigar y leer información'],
@@ -72,7 +73,6 @@ $currentSection = $questions[$page];
 
 <div class="container mt-4">
   <div id="mensajeEnvio" class="alert alert-success d-none" role="alert"></div>
-  <!-- Barra de progreso -->
   <div class="progress mb-4">
     <div class="progress-bar" role="progressbar" style="width: <?= ($page / $totalPages) * 100 ?>%" 
          aria-valuenow="<?= $page ?>" aria-valuemin="0" aria-valuemax="<?= $totalPages ?>">
@@ -91,7 +91,7 @@ $currentSection = $questions[$page];
             <input class="form-check-input"
                   type="radio"
                   name="q<?= $page ?>_<?= $index ?>"
-                  value="<?= chr(97 + $key) ?>"
+                  value="<?= htmlspecialchars($option) ?>"
                   id="q<?= $page ?>_<?= $index ?>_<?= $key ?>"
                   required>
             <label class="form-check-label" for="q<?= $page ?>_<?= $index ?>_<?= $key ?>">
@@ -121,4 +121,4 @@ $currentSection = $questions[$page];
 <script src="/PROYECTOFINALTECWEB/public/assets/js/botonID.js"></script>
 </body>
 </html>
-<?php include __DIR__ . '/layouts/footer.php';  ?>
+<?php include __DIR__ . '/../Views/layouts/footer.php';  ?>

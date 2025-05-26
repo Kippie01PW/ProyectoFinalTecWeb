@@ -8,16 +8,8 @@ use App\Controllers\MaestroController;
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+$maestro_id = $_SESSION['maestro_id'] ?? 4;
 
-// CORRECCIÓN: Usar maestro_id en lugar de user_id
-$maestro_id = $_SESSION['maestro_id'] ?? null;
-
-// Verificar que tenemos el maestro_id
-if (!$maestro_id) {
-    // Si no tenemos maestro_id, redirigir al login
-    header('Location: /ProyectoFinalTecWeb/public/login');
-    exit;
-}
 
 $dashboard = new Data_Maestro($maestro_id);
 
@@ -46,6 +38,11 @@ $jsHandler = new \App\Controllers\MaestroController($datosPreguntas, $preguntasT
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/ProyectoFinalTecWeb/public/assets/js/dashboard_maestro.js"></script>
+
+
+
+
+
 </head>
 <body>
 
@@ -122,18 +119,17 @@ $jsHandler = new \App\Controllers\MaestroController($datosPreguntas, $preguntasT
                             <i class="bi bi-person-circle fs-1"></i>
                             <div class="card-body">
                                 <form id="formularioMaestro" action="Maestro_actu.php" method="POST">
-                                    <!-- CORRECCIÓN: Usar el user_id (no maestro_id) para las actualizaciones -->
-                                    <input type="hidden" name="maestro_id" value="<?= $_SESSION['user_id'] ?>">
+                                    <input type="hidden" name="maestro_id" value="<?= $maestro_id ?>">
 
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold">Nombre:</label>
-                                        <input type="text" class="form-control" value="<?= htmlspecialchars($maestro['username'] ?? 'Sin nombre') ?>" readonly>
+                                        <input type="text" class="form-control" value="<?= htmlspecialchars($maestro['username']) ?>" readonly>
                                     </div>
 
                                     <div class="mb-3 d-flex justify-content-between align-items-center">
                                         <div style="flex: 1;">
                                             <label class="form-label fw-semibold">Correo:</label>
-                                            <input type="email" name="correo" id="inputCorreo" class="form-control" value="<?= htmlspecialchars($maestro['email'] ?? '') ?>">
+                                            <input type="email" name="correo" id="inputCorreo" class="form-control" value="<?= htmlspecialchars($maestro['email']) ?>">
                                         </div>
                                         <button type="button" class="btn btn-outline-primary ms-3 mt-4" onclick="actualizarDato('correo')">Actualizar</button>
                                     </div>
@@ -191,15 +187,16 @@ $jsHandler = new \App\Controllers\MaestroController($datosPreguntas, $preguntasT
 </div>
 
 <script>
-    // CORRECCIÓN: Usar user_id para las actualizaciones de perfil
-    const MAESTRO_ID = <?= json_encode($_SESSION['user_id']) ?>;
+    const MAESTRO_ID = <?= json_encode($maestro_id) ?>;
     window.MAESTRO_ID = MAESTRO_ID;
 </script>
+
 
 <?php 
 echo $jsHandler->generarJavaScript();
 $dashboard->cerrarConexion();
 ?>
+
 
 </body>
 </html>

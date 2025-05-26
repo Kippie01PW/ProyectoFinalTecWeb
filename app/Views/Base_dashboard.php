@@ -10,7 +10,7 @@ use App\Controllers\MaestroController;
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-$maestro_id = $_SESSION['user_id'] ?? 4;
+$maestro_id = $_SESSION['maestro_id'] ?? 4;
 
 
 $dashboard = new Data_Maestro($maestro_id);

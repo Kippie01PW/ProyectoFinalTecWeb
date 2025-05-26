@@ -14,29 +14,24 @@
 <body>
     <?php require_once APP_ROOT . '/Views/layouts/header_alumnos.php'; ?>
     
-    <div class="dashboard-container">
-        <div class="sidebar">
-            <div class="profile-section">
-                <div class="profile-header">
-                    <div class="profile-avatar">
-                        <?php echo strtoupper(substr($perfil['nombre'] ?? 'A', 0, 1)); ?>
-                    </div>
-                    <div>
-                        <h3><?php echo htmlspecialchars($perfil['nombre'] ?? 'Alumno'); ?></h3>
-                        <p style="color: #666; margin: 0;">Estudiante</p>
-                    </div>
-                </div>
-                
-                <div id="alertContainer"></div>
-                
-                <p>Tu perfil está configurado para mostrar solo las estadísticas.</p>
+    <div style="background-color: #e0f7fa; padding: 15px; text-align: center; margin-bottom: 20px; border-bottom: 1px solid #b2ebf2;">
+        <h2 style="color: #00838f; margin: 0; font-size: 3em;">
+            ¡Bienvenido, <?php echo htmlspecialchars($perfil['nombre'] ?? $_SESSION['username'] ?? 'Alumno'); ?>!</h3>
+    </div>
 
-            </div>
-        </div>
+    <div class="dashboard-container" style="display: flex; justify-content: center; gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; flex-wrap: wrap;">
         
-        <div class="main-content">
-            <h1>¡Bienvenido, <?php echo htmlspecialchars($perfil['nombre'] ?? $_SESSION['username'] ?? 'Alumno'); ?>!</h1>
+        <div class="buttons-container" style="flex: 0 0 auto; width: 200px; padding: 15px; background: #f8f9fa; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 10px;">
             
+            <div style="text-align: center; width: 100%; margin-bottom: 15px; padding-top: 15px; padding-bottom: 10px; border-bottom: 1px solid #e0e0e0;">
+                <h3 style="color: #00838f; margin: 0; font-size: 2.3em;">Completa tus cursos ¡Tú puedes! 🤠</h3>
+            </div>
+
+            <p style="margin-bottom: 0;"><a href="cursos" class="btn btn-secondary" style="display: block; width: 100%; text-align: left;">Ver Mis Cursos</a></p>
+            <p style="margin-bottom: 0;"><a href="/ProyectoFinalTecWeb/public/logout" class="btn btn-secondary" style="display: block; width: 100%; text-align: left;">Cerrar Sesión</a></p>
+        </div>
+
+        <div class="main-content" style="flex: 1; min-width: 600px; max-width: 900px; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
             <div class="stats-summary">
                 <div class="stat-card">
                     <div class="stat-number" id="totalCursos"><?php echo $estadisticas['total'] ?? 0; ?></div>
@@ -57,10 +52,6 @@
             </div>
             
             <hr>
-            <div>
-                <p><a href="cursos" class="btn btn-secondary">Ver Mis Cursos</a></p>
-                <p><a href="/ProyectoFinalTecWeb/public/logout" class="btn btn-secondary">Cerrar Sesión</a></p>
-            </div>
         </div>
     </div>
     

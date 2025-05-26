@@ -1,10 +1,10 @@
-// Dashboard JavaScript - Manejo de estadísticas y gráfica
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Variables globales
+
     let cursosChart = null;
     const alertContainer = document.getElementById('alertContainer');
     
-    // Obtener datos iniciales del PHP (insertados en la vista)
+
     const datosIniciales = {
         estadisticas: {
             total: parseInt(document.getElementById('totalCursos')?.textContent) || 0,
@@ -13,23 +13,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
     
-    // Inicializar dashboard
+
     init();
     
     function init() {
-        // Crear gráfica con datos iniciales
+
         actualizarGrafica(datosIniciales.estadisticas);
         
-        // Cargar estadísticas actualizadas desde el servidor
         cargarEstadisticas();
-        
-        // Actualizar estadísticas cada 5 minutos
+
         setInterval(cargarEstadisticas, 300000);
     }
     
-    /**
-     * Carga las estadísticas desde el servidor
-     */
+
     async function cargarEstadisticas() {
         try {
             const baseUrl = window.location.origin + '/ProyectoFinalTecWeb/public/alumnos/dashboard/';
@@ -67,9 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    /**
-     * Actualiza los números de estadísticas en la UI
-     */
+
     function actualizarEstadisticas(datos) {
         const totalElement = document.getElementById('totalCursos');
         const asignadosElement = document.getElementById('cursosAsignados');
@@ -86,13 +80,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    /**
-     * Anima el cambio de números con efecto contador
-     */
+
     function animarNumero(element, valorFinal) {
         const valorInicial = parseInt(element.textContent) || 0;
         const diferencia = valorFinal - valorInicial;
-        const duracion = 1000; // 1 segundo
+        const duracion = 1000; 
         const pasos = 20;
         const incremento = diferencia / pasos;
         let paso = 0;
@@ -109,9 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, duracion / pasos);
     }
     
-    /**
-     * Actualiza la gráfica de cursos
-     */
+
     function actualizarGrafica(datos) {
         const ctx = document.getElementById('cursosChart');
         if (!ctx) return;
@@ -127,18 +117,20 @@ document.addEventListener('DOMContentLoaded', function() {
         cursosChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['Completados', 'Asignados (Pendientes)', 'Sin Asignar'],
+                labels: ['Completados', 'Asignados (Pendientes)'],
                 datasets: [{
                     data: [
                         completados,
-                        asignados - completados, // Cursos asignados pero no completados
-                        Math.max(0, total - asignados) // Cursos totales menos los asignados
+                        asignados , 
+                        
                     ],
-                    backgroundColor: [
-                        '#28a745', // Verde para completados
-                        '#ffc107', // Amarillo para asignados/pendientes
-                        '#dc3545'  // Rojo para sin asignar
-                    ],
+                    
+
+                   backgroundColor: [
+                       '#29b6f6', 
+                       '#4dd0e1', 
+                       '#80deea'  
+                   ],
                     borderWidth: 2,
                     borderColor: '#fff'
                 }]
@@ -174,9 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    /**
-     * Muestra alertas al usuario (Mantenemos por si se usa para errores de carga de estadísticas)
-     */
+
     function mostrarAlerta(mensaje, tipo = 'info') {
         if (!alertContainer) return;
         
@@ -204,9 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
         alerta.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
     
-    /**
-     * Manejo de errores de red
-     */
+   
     window.addEventListener('online', function() {
         mostrarAlerta('Conexión restaurada', 'success');
         cargarEstadisticas();
@@ -215,10 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('offline', function() {
         mostrarAlerta('Sin conexión a internet', 'error');
     });
-    
-    /**
-     * Limpieza al cerrar la página
-     */
+
     window.addEventListener('beforeunload', function() {
         if (cursosChart) {
             cursosChart.destroy();

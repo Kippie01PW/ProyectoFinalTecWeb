@@ -50,10 +50,23 @@ private function contarOpciones($pregunta) {
         return [
             'pregunta1' => $this->contarOpciones('pregunta1'),
             'pregunta2' => $this->contarOpciones('pregunta2'),
+            'pregunta3' => $this->contarOpciones('pregunta3'),
             'pregunta4' => $this->contarOpciones('pregunta4'),
             'pregunta5' => $this->contarOpciones('pregunta5'),
+            'pregunta6' => $this->contarOpciones('pregunta6'),
+            'pregunta7' => $this->contarOpciones('pregunta7'),
+            'pregunta8' => $this->contarOpciones('pregunta8'),
+            'pregunta9' => $this->contarOpciones('pregunta9'),
+            'pregunta10' => $this->contarOpciones('pregunta10'),
             'pregunta11' => $this->contarOpciones('pregunta11'),
+            'pregunta12' => $this->contarOpciones('pregunta12'),
+            'pregunta13' => $this->contarOpciones('pregunta13'),
+            'pregunta14' => $this->contarOpciones('pregunta14'),
             'pregunta15' => $this->contarOpciones('pregunta15'),
+            'pregunta16' => $this->contarOpciones('pregunta16'),
+            'pregunta17' => $this->contarOpciones('pregunta17'),
+            'pregunta18' => $this->contarOpciones('pregunta18'),
+            'pregunta19' => $this->contarOpciones('pregunta19'),
             'pregunta20' => $this->contarOpciones('pregunta20'),
         ];
     }
@@ -62,10 +75,23 @@ private function contarOpciones($pregunta) {
         return [
             'pregunta1' => '¿Qué área del conocimiento te interesa más?',
             'pregunta2' => '¿En qué área sueles obtener mejores calificaciones?',
+            'pregunta3' => '¿Te gusta más trabajar solo o en equipo?',
             'pregunta4' => '¿Qué prefieres hacer?',
             'pregunta5' => '¿Cómo te gusta aprender temas nuevos?',
+            'pregunta6' => '¿Qué te gusta hacer en tu tiempo libre?',
+            'pregunta7' => '¿Qué prefieres usar en tus actividades escolares o creativas?',
+            'pregunta8' => '¿Qué tipo de actividades disfrutas más?',
+            'pregunta9' => '¿Qué tipo de juegos prefieres?',
+            'pregunta10' => 'Si pudieras aprender algo nuevo, ¿qué escogerías?',
             'pregunta11' => '¿Cómo aprendes mejor?',
+            'pregunta12' => '¿Prefieres aprender solo o en grupo?',
+            'pregunta13' => '¿Qué formato de contenido te resulta más útil?',
+            'pregunta14' => '¿Qué herramientas digitales sueles usar para estudiar?',
             'pregunta15' => '¿Con qué frecuencia utilizas tecnología para estudiar?',
+            'pregunta16' => '¿Prefieres estudiar en un dispositivo específico?',
+            'pregunta17' => '¿Te gusta que el curso tenga ejercicios interactivos (cuestionarios, juegos, simuladores)?',
+            'pregunta18' => '¿Utilizas alguna técnica de estudio en formato digital? (marca una o varias)',
+            'pregunta19' => '¿Te gustaría tener retroalimentación inmediata en las actividades del curso?',
             'pregunta20' => '¿Qué te motiva más a aprender en un curso?'
         ];
     }

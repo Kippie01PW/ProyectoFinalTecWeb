@@ -8,18 +8,27 @@
                 <h5 class="text-custom-green mb-3">Legalidad</h5>
                 <ul class="list-unstyled">
                     <li class="mb-2">
-                        <a href="/legal-warning" class="text-white text-decoration-none hover-green">Aviso Legal</a>
+                        <a href="https://www.pexels.com/license/" class="text-white text-decoration-none hover-green" target="_blank" rel="noopener noreferrer">
+                            Licencia de Pexels - Stock Images
+                        </a>
                     </li>
                     <li class="mb-2">
-                        <a href="/privacy-policy" class="text-white text-decoration-none hover-green">Política de Privacidad</a>
+                        <a href="https://getbootstrap.com/docs/4.0/about/license/" class="text-white text-decoration-none hover-green" target="_blank" rel="noopener noreferrer">
+                            Licencia MIT - Bootstrap
+                        </a>
                     </li>
                     <li class="mb-2">
-                        <a href="/cookies-policy" class="text-white text-decoration-none hover-green">Política de Cookies</a>
+                        <a href="https://www.un.org/sustainabledevelopment/es/education/" class="text-white text-decoration-none hover-green" target="_blank" rel="noopener noreferrer">
+                            Información del ODS 4
+                        </a>
                     </li>
                     <li>
-                        <a href="/quality-policy" class="text-white text-decoration-none hover-green">Política de Calidad</a>
+                        <a href="https://docs.google.com/document/d/1Vj8-Z8wMxuDiN3PjYX3lIer_2YntYacV/edit#heading=h.uhrwmgflv13u" class="text-white text-decoration-none hover-green" target="_blank" rel="noopener noreferrer">
+                            Artículo IEEE de NexoLearn
+                        </a>
                     </li>
                 </ul>
+
             </div>
 
             <div class="col-md-4 mb-4 text-center">

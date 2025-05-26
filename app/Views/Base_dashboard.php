@@ -1,5 +1,8 @@
 <?php 
+// 1. Incluye el header (que ya abre <html>, <head>, <body> y carga CSS/JS comunes)
+include __DIR__ . '/layouts/header_maestro.php';
 
+// 2. Prepara tus datos PHP
 require_once __DIR__ . '/../Models/Data_Maestro.php';
 require_once __DIR__ . '/../Controllers/MaestroController.php';
 
@@ -10,9 +13,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 $maestro_id = $_SESSION['maestro_id'] ?? 4;
 
-
 $dashboard = new Data_Maestro($maestro_id);
-
 $datosPreguntas = $dashboard->getDatosPreguntas();
 $preguntasTexto = $dashboard->getPreguntasTexto();
 $totalAlumnos = $dashboard->getTotalAlumnos();
@@ -20,54 +21,32 @@ $totalCursos = $dashboard->getTotalCursos();
 $alumnosTerminados = $dashboard->getAlumnosTerminados();
 $maestro = $dashboard->getDatosMaestro();
 $datosProgreso = $dashboard->getDatosProgreso();
-
 $jsHandler = new \App\Controllers\MaestroController($datosPreguntas, $preguntasTexto, $datosProgreso);
+
+// ---> ¡NO MÁS <head> NI <body> AQUÍ! <---
+
+// 3. Añade CSS/JS específicos SI ES NECESARIO (Idealmente en Header/Footer)
+//    PERO NO VUELVAS A CARGAR BOOTSTRAP/JQUERY
 ?>
-
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <?php include __DIR__ . '/layouts/header_maestro.php';?>
-    <title>Dashboard Maestros</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/ProyectoFinalTecWeb/public/assets/js/dashboard_maestro.js"></script>
-
-
-
-
-
-</head>
-<body>
-
-<!-- ================== CONTENIDO ================== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <div class="container-fluid">
     <div class="row">
         <div class="col-12 col-lg-10 mx-auto p-4 mt-5">
-            <!-- ===== TÍTULO ===== -->
-             <div class="titulo px-5 ms-5 mb-4">
+            <div class="titulo px-5 ms-5 mb-4">
                 <h1 class="text-dark fw-bold fs-2">DASHBOARD MAESTRO</h1>
              </div>
              
-            <!-- ===== SECCIÓN DINÁMICA DE GRÁFICA ===== -->
             <div class="card mb-4">
                 <div class="card-body">
                     <div class="row">
-                        <!-- Gráfica principal a la izquierda -->
                         <div class="col-md-7 d-flex flex-column align-items-center">
-                            <!-- Título de la gráfica -->
                             <h5 id="tituloGrafica" class="fw-bold text-center mb-4"></h5>
                             <div class="grafico-container mx-auto" style="width: 100%; height: 400px;">
                                 <canvas id="grafico"></canvas>
                             </div>
 
-                            <!-- Controles de la gráfica -->
                             <div class="d-flex justify-content-center mt-4">
                                 <select id="dataSelect" class="form-select me-2 text-center w-auto">
                                     <option value="formulario">Formulario</option>
@@ -82,7 +61,6 @@ $jsHandler = new \App\Controllers\MaestroController($datosPreguntas, $preguntasT
                             </div>
                         </div>
 
-                        <!-- Panel de estadísticas a la derecha -->
                         <div class="col-md-5" style="display: flex; align-items: center; height: 400px;">
                             <div class="card border-secondary w-100" style="margin: auto;">
                                 <div class="card-header bg-secondary text-white text-center">
@@ -110,9 +88,7 @@ $jsHandler = new \App\Controllers\MaestroController($datosPreguntas, $preguntasT
                 </div>
             </div>
 
-            <!-- ===== SECCIÓN DE PERFIL Y CONFIGURACIÓN ===== -->
             <div class="row">
-                <!-- Perfil del maestro -->
                 <div class="col-md-5">
                     <div class="card mb-4 mt-4">
                         <div class="card-body">
@@ -147,7 +123,6 @@ $jsHandler = new \App\Controllers\MaestroController($datosPreguntas, $preguntasT
                     </div>
                 </div>
 
-                <!-- Panel de información adicional -->
                 <div class="col-md-7">
                     <div class="card mb-4 mt-4">
                         <div class="card-body" style="padding-bottom: 17px;">
@@ -187,20 +162,16 @@ $jsHandler = new \App\Controllers\MaestroController($datosPreguntas, $preguntasT
 </div>
 
 <script>
+    // 4. Pasa variables PHP a JS si es necesario
     const MAESTRO_ID = <?= json_encode($maestro_id) ?>;
     window.MAESTRO_ID = MAESTRO_ID;
 </script>
 
-
 <?php 
+// 5. Genera JS dinámico si es necesario
 echo $jsHandler->generarJavaScript();
 $dashboard->cerrarConexion();
-?>
 
-
-</body>
-</html>
-
-<?php 
-    include __DIR__ . '/layouts/footer.php'; 
+// 6. Incluye el footer (que ya cierra <body>, <html> y carga JS comunes)
+include __DIR__ . '/layouts/footer.php'; 
 ?>

@@ -47,20 +47,23 @@
                     <li class="nav-item dropdown mx-2">
                         <a class="nav-link dropdown-toggle" 
                            href="#" 
+                           id="configDropdown" 
                            role="button" 
-                           data-bs-toggle="dropdown">
+                           data-bs-toggle="dropdown" 
+                           aria-expanded="false"> 
                             <i class="bi bi-gear-fill me-1"></i>
                             Configuración
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/maestro/perfil">
-                                <i class="bi bi-person-circle me-2"></i>Mi Perfil
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="configDropdown"> 
+                            <li><a class="dropdown-item" href="/ProyectoFinalTecWeb/public/">
+                                <i class="bi bi-house-door-fill me-2"></i>Regresar al Home
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" href="/ProyectoFinalTecWeb/public/logout">
                                 <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
                             </a></li>
                         </ul>
+                        
                     </li>
                 </ul>
             </div>

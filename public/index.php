@@ -12,9 +12,7 @@ use Slim\Factory\AppFactory;
 use App\Controllers\AlumnoController;
 use App\Controllers\AuthController; 
 use Psr\Http\Server\RequestHandlerInterface;
-////NUEVO
 use App\Controllers\PreferenciasAlumnoController;
-///Nuevo
 use App\Controllers\CursoController;
 use App\Controllers\ClaseController;
 use App\Controllers\DashboardController;
@@ -84,9 +82,7 @@ $app->group('/api/alumnos', function ($group) {
     $group->get('/cursos/asignados', \App\Controllers\AlumnoController::class . ':getCursosAsignados'); 
     $group->get('/cursos/completados', \App\Controllers\AlumnoController::class . ':getCursosCompletados');
     $group->get('/clases', \App\Controllers\AlumnoController::class . ':getMisClases');
-    // $group->post('/clases/unirse', \App\Controllers\AlumnoController::class . ':unirseAClase'); // <-- COMENTAREMOS O ELIMINAREMOS ESTA
 
-    // En la sección de rutas API Alumno, reemplazar las líneas existentes:
     $group->get('/cursos/mostrar/asignados', \App\Controllers\MostrarCursosController::class . ':getCursosAsignados');
     $group->get('/cursos/mostrar/completados', \App\Controllers\MostrarCursosController::class . ':getCursosCompletados');
 
@@ -95,23 +91,20 @@ $app->group('/api/alumnos', function ($group) {
 })->add($requireAlumno)->add($requireAuth); 
 
 
-$app->get('/register', AuthController::class . ':showRegisterForm'); // <-- ¡NUEVO!
+$app->get('/register', AuthController::class . ':showRegisterForm'); 
 $app->post('/api/auth/register', \App\Controllers\AuthController::class . ':processRegistration');
 $app->get('/login', \App\Controllers\AuthController::class . ':showLoginForm');
 $app->post('/api/auth/login', \App\Controllers\AuthController::class . ':processLogin');
 $app->get('/logout', \App\Controllers\AuthController::class . ':logout');
 
-///Nuevo
+
 // Rutas para Cursos 
 
 $app->group('/cursos', function ($group) {
-    // Mostrar formulario para crear nuevo curso
+    
     $group->get('/nuevo', CursoController::class . ':showForm');
-    // Procesar creación de curso
     $group->post('/guardar', CursoController::class . ':guardarCurso');
-    // Listar todos los cursos
     $group->get('/listar', CursoController::class . ':listarCursos');
-    // Listar cursos por categoría
     $group->get('/categoria/{id}', CursoController::class . ':listarCursos');
 });
 
@@ -121,7 +114,7 @@ $app->get('/maestros/dashboard', function (Request $request, Response $response,
     }
     
     ob_start();
-    require APP_ROOT . '/Views/Base_dashboard.php'; // Tu archivo actual
+    require APP_ROOT . '/Views/Base_dashboard.php'; 
     $output = ob_get_clean();
     $response->getBody()->write($output);
     return $response;
@@ -131,7 +124,7 @@ $app->get('/maestros/dashboard', function (Request $request, Response $response,
 $app->group('/clases', function ($group) {
     $group->get('/', \App\Controllers\ClaseController::class . ':showClases');
     $group->get('/index', \App\Controllers\ClaseController::class . ':showClases');
-    $group->get('/editar/{id}', \App\Controllers\ClaseController::class . ':showEditar');  // ← NUEVA
+    $group->get('/editar/{id}', \App\Controllers\ClaseController::class . ':showEditar');  
     $group->get('/ver/{id}', \App\Controllers\ClaseController::class . ':verClase');
 })->add($requireMaestro)->add($requireAuth);
 
@@ -141,12 +134,12 @@ $app->group('/api/clases', function ($group) {
     $group->post('/unirse', \App\Controllers\ClaseController::class . ':unirseClase');
     $group->get('/estadisticas/{id}', \App\Controllers\ClaseController::class . ':obtenerEstadisticas');
     $group->get('/detalles/{id}', \App\Controllers\ClaseController::class . ':obtenerDetalles');
-    $group->post('/actualizar/{id}', \App\Controllers\ClaseController::class . ':actualizarClase');  // ← NUEVA
+    $group->post('/actualizar/{id}', \App\Controllers\ClaseController::class . ':actualizarClase');  
 
       $group->get('/evidencias', \App\Controllers\ClaseController::class . ':obtenerEvidencias');
 });
 
-// --- Fin de Rutas ---
+
 
 // 7. Ejecutar la Aplicación
 $app->run();

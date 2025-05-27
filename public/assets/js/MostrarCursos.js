@@ -149,7 +149,6 @@ function subirEvidencia() {
     formData.append('evidencia', fileInput.files[0]);
     formData.append('asignacion_id', asignacionId);
     
-    // Cambiar el botón para mostrar que se está subiendo
     const submitBtn = document.querySelector('#form-evidencia button[type="submit"]');
     submitBtn.innerHTML = 'Subiendo...';
     submitBtn.disabled = true;
@@ -164,7 +163,7 @@ function subirEvidencia() {
             if (response.success) {
                 alert('Evidencia subida correctamente. El curso ha sido marcado como completado.');
                 cerrarModal();
-                // Recargar ambas tablas
+                
                 cargarCursosAsignados();
                 cargarCursosCompletados();
             } else {

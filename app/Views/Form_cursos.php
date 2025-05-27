@@ -1,6 +1,4 @@
 <?php
-// Las variables $categorias, $error, $success vienen del controlador
-// Verificar que están definidas
 if (!isset($categorias)) {
     $categorias = [];
 }
@@ -191,17 +189,15 @@ if (!isset($success)) {
             const descripcionCategoriaGroup = document.getElementById('descripcion-categoria-group');
             const form = document.getElementById('cursoForm');
 
-            // Mostrar campo de descripción cuando se escribe una nueva categoría
             nuevaCategoriaInput.addEventListener('input', function() {
                 if (this.value.trim()) {
                     descripcionCategoriaGroup.style.display = 'block';
-                    categoriaSelect.value = ''; // Limpiar selección existente
+                    categoriaSelect.value = ''; 
                 } else {
                     descripcionCategoriaGroup.style.display = 'none';
                 }
             });
 
-            // Limpiar nueva categoría cuando se selecciona una existente
             categoriaSelect.addEventListener('change', function() {
                 if (this.value) {
                     nuevaCategoriaInput.value = '';
@@ -210,7 +206,6 @@ if (!isset($success)) {
                 }
             });
 
-            // Validación del formulario
             form.addEventListener('submit', function(e) {
                 const categoriaId = categoriaSelect.value;
                 const nuevaCategoria = nuevaCategoriaInput.value.trim();

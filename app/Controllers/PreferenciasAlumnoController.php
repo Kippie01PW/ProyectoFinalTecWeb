@@ -4,16 +4,13 @@ namespace App\Controllers;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Core\Conexion;
-use App\Models\PreferenciasAlumnoModel; // Import faltante agregado
+use App\Models\PreferenciasAlumnoModel; 
 
 class PreferenciasAlumnoController {
 
     public function showFormulario(Request $request, Response $response, $args) {
-    // Manejar datos POST si existen (navegación entre páginas)
     if ($request->getMethod() === 'POST') {
         $data = $request->getParsedBody();
-        // Aquí podrías guardar temporalmente los datos si fuera necesario
-        // Por ahora solo redirigimos a la siguiente página
     }
     
         ob_start();
@@ -38,7 +35,6 @@ class PreferenciasAlumnoController {
     try {
         $pdo = (new \App\Core\Conexion())->getConexion();
 
-        // Buscar el alumno_id correspondiente al usuario_id
         $stmt = $pdo->prepare("SELECT id FROM alumno WHERE usuario_id = ?");
         $stmt->execute([$usuario_id]);
         $alumno = $stmt->fetch();

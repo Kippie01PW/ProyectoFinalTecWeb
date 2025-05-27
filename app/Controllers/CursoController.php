@@ -16,20 +16,16 @@ class CursoController {
             $model = new CursoModel($db);
             $categorias = $model->obtenerCategorias();
 
-            // Debug: verificar que se obtienen las categorías
             error_log("Categorías obtenidas: " . print_r($categorias, true));
 
-            // Verificar conexión y datos
             if ($categorias === false || $categorias === null) {
                 error_log("Error: No se pudieron obtener las categorías de la base de datos");
                 $categorias = [];
             }
 
-            // Variables para el formulario
             $error = '';
             $success = '';
             
-            // Procesar mensajes de éxito o error desde GET
             if (isset($_GET['success']) && $_GET['success'] == '1') {
                 $success = 'Curso guardado exitosamente.';
             }
@@ -37,14 +33,12 @@ class CursoController {
                 $error = htmlspecialchars($_GET['error']);
             }
 
-            // Hacer las variables disponibles para la vista
             $data = [
                 'categorias' => $categorias,
                 'error' => $error,
                 'success' => $success
             ];
 
-            // Extraer variables para la vista
             extract($data);
 
             ob_start();
@@ -64,7 +58,6 @@ class CursoController {
         try {
             $data = $request->getParsedBody();
             
-            // Validar datos requeridos
             if (empty($data['titulo'])) {
                 throw new Exception("El título del curso es requerido.");
             }
@@ -72,12 +65,10 @@ class CursoController {
             $db = (new Conexion())->getConexion();
             $model = new CursoModel($db);
 
-            // Comenzar transacción
             $db->beginTransaction();
 
             $categoria_id = null;
 
-            // Insertar nueva categoría si se proporciona
             if (!empty($data['nueva_categoria'])) {
                 if (empty(trim($data['nueva_categoria']))) {
                     throw new Exception("El nombre de la nueva categoría no puede estar vacío.");
@@ -95,12 +86,10 @@ class CursoController {
                 throw new Exception("Debe seleccionar una categoría existente o crear una nueva.");
             }
 
-            // Validar URL si se proporciona
             if (!empty($data['enlace_externo']) && !filter_var($data['enlace_externo'], FILTER_VALIDATE_URL)) {
                 throw new Exception("El enlace externo debe ser una URL válida.");
             }
 
-            // Insertar curso
             $curso_id = $model->insertarCurso(
                 $categoria_id,
                 trim($data['titulo']),
@@ -108,23 +97,19 @@ class CursoController {
                 trim($data['enlace_externo']) ?: null
             );
 
-            // Confirmar transacción
             $db->commit();
 
-            // Redirigir con mensaje de éxito
             return $response
                 ->withHeader('Location', '/ProyectoFinalTecWeb/public/cursos/nuevo?success=1')
                 ->withStatus(302);
 
         } catch (Exception $e) {
-            // Revertir transacción en caso de error
             if (isset($db) && $db->inTransaction()) {
                 $db->rollBack();
             }
             
             error_log("Error al guardar curso: " . $e->getMessage());
             
-            // Redirigir con mensaje de error
             return $response
                 ->withHeader('Location', '/ProyectoFinalTecWeb/public/cursos/nuevo?error=' . urlencode($e->getMessage()))
                 ->withStatus(302);

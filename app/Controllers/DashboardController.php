@@ -8,22 +8,18 @@ use App\Models\DashboardModel;
 use \PDO;
 use \Exception;
 
-// require_once __DIR__ . '/../Models/DashboardModel.php'; // Esta línea ya no es necesaria si usas Composer autoload
 
 class DashboardController {
     private $dashboardModel;
-    private $db; // Añadimos una propiedad para la conexión PDO si la necesitamos directamente
+    private $db; 
 
-    // Modificamos el constructor para que también cree la conexión
-    public function __construct() { //
-        $conexion = new Conexion(); // Creamos una nueva instancia de Conexion
-        $this->db = $conexion->getConexion(); // Obtenemos la conexión PDO real
-        $this->dashboardModel = new DashboardModel($this->db); // Pasamos la conexión al modelo
+   
+    public function __construct() { 
+        $conexion = new Conexion(); 
+        $this->db = $conexion->getConexion(); 
+        $this->dashboardModel = new DashboardModel($this->db); 
     }
     
-    /**
-     * Muestra el dashboard principal del alumno con estadísticas
-     */
     public function index(Request $request, Response $response, $args) {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'alumno') {
             return $response->withHeader('Location', '/ProyectoFinalTecWeb/public/login')->withStatus(302);
@@ -33,7 +29,6 @@ class DashboardController {
         
         $nombreUsuario = $_SESSION['username'] ?? 'Alumno';
 
-        // Obtener ID del alumno para las estadísticas
         $alumno_id = $this->getAlumnoId($usuario_id);
         
         $estadisticas = [];
@@ -53,9 +48,6 @@ class DashboardController {
         return $response;
     }
     
-    /**
-     * API endpoint para obtener estadísticas de cursos (JSON)
-     */
     public function getEstadisticas(Request $request, Response $response, $args) {
         if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'alumno') {
             $response->getBody()->write(json_encode(['error' => 'No autorizado']));
@@ -75,12 +67,8 @@ class DashboardController {
         return $response->withHeader('Content-Type', 'application/json');
     }
     
-    /**
-     * Obtiene el ID del alumno basado en el usuario_id
-     */
     private function getAlumnoId($usuario_id) {
         try {
-            // Usamos la conexión que ya creamos en el constructor del controlador
             $db = $this->db; 
             $query = "SELECT id FROM alumno WHERE usuario_id = :usuario_id";
             $stmt = $db->prepare($query);
@@ -96,9 +84,6 @@ class DashboardController {
         }
     }
     
-    /**
-     * Carga una vista con datos
-     */
     private function loadView($view, $data = []) {
         extract($data);
         $viewPath = APP_ROOT . '/Views/' . $view . '.php'; 

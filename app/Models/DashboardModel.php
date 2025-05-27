@@ -1,19 +1,17 @@
 <?php
 namespace App\Models;
-use App\Core\Conexion; // Aún necesitamos esta línea para saber dónde está Conexion si la creamos en otro lugar.
-use \PDO; // Importamos PDO
+use App\Core\Conexion; 
+use \PDO; 
 
 class DashboardModel {
     private $db;
     
-    // Modificamos el constructor para que reciba la conexión PDO
-    public function __construct(\PDO $db) { //
-        $this->db = $db; //
+   
+    public function __construct(\PDO $db) { 
+        $this->db = $db; 
     }
     
-    /**
-     * Obtiene estadísticas de cursos para un alumno
-     */
+
     public function getCursosEstadisticas($alumno_id) {
         try {
             $query = "SELECT 

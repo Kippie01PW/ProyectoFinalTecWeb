@@ -14,7 +14,6 @@ class CursoModel {
 
     public function insertarCategoria($nombre, $descripcion = null) {
         try {
-            // Verificar si la categoría ya existe
             $stmt = $this->db->prepare("SELECT id FROM categoriascurso WHERE nombre = ?");
             $stmt->execute([$nombre]);
             if ($stmt->fetch()) {
@@ -31,12 +30,10 @@ class CursoModel {
 
     public function insertarCurso($categoria_id, $titulo, $descripcion = null, $enlace_externo = null) {
         try {
-            // Verificar que la categoría existe
             if (!$this->existeCategoria($categoria_id)) {
                 throw new Exception("La categoría especificada no existe.");
             }
 
-            // Verificar que el curso no existe ya
             $stmt = $this->db->prepare("SELECT id FROM cursos WHERE titulo = ? AND categoria_id = ?");
             $stmt->execute([$titulo, $categoria_id]);
             if ($stmt->fetch()) {
@@ -53,7 +50,6 @@ class CursoModel {
 
     public function obtenerCategorias() {
         try {
-            // Verificar que la conexión existe
             if (!$this->db) {
                 error_log("Error: Conexión a base de datos no disponible");
                 return [];
@@ -69,7 +65,6 @@ class CursoModel {
             $stmt->execute();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
-            // Log para debugging
             error_log("Consulta ejecutada. Resultados: " . count($result));
             error_log("Datos obtenidos: " . print_r($result, true));
             

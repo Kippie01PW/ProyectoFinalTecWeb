@@ -41,11 +41,11 @@
         }
         
         .curso-seccion.asignados { 
-            width: 65%; /* Más espacio para cursos asignados */
+            width: 65%;
         }
         
         .curso-seccion.completados { 
-            width: 32%; /* Menos espacio para cursos completados */
+            width: 32%; 
         }
         
         table { 

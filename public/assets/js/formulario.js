@@ -1,9 +1,6 @@
-// formulario.js
 $(document).ready(function() {
     const baseUrl = "/ProyectoFinalTecWeb/public";
 
-    // Modificado: Ahora simplemente devuelve el valor del input,
-    // que debe ser el texto de la opción gracias al cambio en Formulario.php
     function getTextoLabel(input) {
         return input.value;
     }
@@ -50,7 +47,7 @@ $(document).ready(function() {
             const nombreRaw = input.name;
             const nombre = nombreRaw.replace(/\[\]$/, '');
 
-            if (preguntasProcesadas.has(nombre)) return; // Evita procesar la misma pregunta más de una vez por su nombre
+            if (preguntasProcesadas.has(nombre)) return; 
 
             const inputsMismoNombre = document.querySelectorAll(`[name="${nombreRaw}"]`);
             let valores = [];
@@ -85,14 +82,8 @@ $(document).ready(function() {
 
         console.log("Todas las respuestas a enviar:", todasLasRespuestas);
 
-        // Se esperan 20 respuestas en total (5 por sección, 3 secciones = 15 preguntas de la parte I y II, 10 de la parte II)
-        // Ojo: tus preguntas son:
-        // Pág 1: 5 preguntas
-        // Pág 2: 5 preguntas
-        // Pág 3: 10 preguntas
-        // Total = 20 preguntas. Tu chequeo de `numRespuestas < 20` es correcto si todas las preguntas de todas las páginas se guardan antes del envío final.
         const numRespuestas = Object.keys(todasLasRespuestas).length;
-        if (numRespuestas < 20) { // El número 20 debe coincidir con el total de preguntas de todas las páginas
+        if (numRespuestas < 20) { 
             alert(`Faltan respuestas. Se encontraron ${numRespuestas} de 20 esperadas.`);
             return;
         }
@@ -126,7 +117,6 @@ $(document).ready(function() {
             return false;
         }
 
-        // Guarda las respuestas de la página actual antes de avanzar o enviar
         guardarDatosTemporales(); 
 
         const btnText = $(this).text().trim();
@@ -135,7 +125,7 @@ $(document).ready(function() {
             enviarPreferencias();
         } else {
             const form = document.getElementById('formPreferencias');
-            form.submit(); // Esto envía el formulario y recarga la página a la siguiente
+            form.submit(); 
         }
     });
 
@@ -143,7 +133,7 @@ $(document).ready(function() {
         const datosGuardados = JSON.parse(sessionStorage.getItem('preferenciasFormulario') || '{}');
 
         Object.keys(datosGuardados).forEach(nombre => {
-            const valor = datosGuardados[nombre]; // El valor guardado (ej: "Ciencias")
+            const valor = datosGuardados[nombre]; 
             const inputs = document.querySelectorAll(`[name="${nombre}"], [name="${nombre}[]"]`);
 
             if (inputs.length > 0) {
@@ -158,12 +148,10 @@ $(document).ready(function() {
                     }
 
                     inputs.forEach(input => {
-                        // Compara el valor del input (ej: "Ciencias") con el valor guardado (ej: "Ciencias")
                         input.checked = valores.includes(input.value); 
                     });
                 } else if (tipoInput === 'radio') {
                     inputs.forEach(input => {
-                        // Compara el valor del input (ej: "Ciencias") con el valor guardado (ej: "Ciencias")
                         input.checked = input.value === valor; 
                     });
                 } else {
@@ -173,13 +161,11 @@ $(document).ready(function() {
         });
     }
 
-    // Cargar datos al cargar la página para restaurar las selecciones
     cargarDatosGuardados();
 
-    // Mostrar mensaje en el dashboard si existe en sessionStorage (no relacionado con este formulario directamente)
     const mensaje = sessionStorage.getItem('mensajeDashboard');
     if (mensaje) {
-        const contenedor = $('#mensajeDashboard'); // Asegúrate de tener un #mensajeDashboard en la vista del dashboard si lo necesitas
+        const contenedor = $('#mensajeDashboard'); 
         if (contenedor.length > 0) {
             contenedor.text(mensaje).css({
                 'display': 'block',

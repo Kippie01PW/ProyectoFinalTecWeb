@@ -63,7 +63,7 @@ class Data_Alumno {
         
         $etiquetas = [];
         $valores = [];
-        // Los estados válidos según tu tabla son: 'asignado' y 'completado'
+       
         $estados = ['asignado' => 0, 'completado' => 0];
         
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
@@ -84,8 +84,7 @@ class Data_Alumno {
 }
 
 public function getProgresoDetallado() {
-    // Como no existe campo 'progreso' en tu tabla, calculamos el progreso
-    // basado en el estado (completado = 100%, asignado = 0%)
+    
     $sql = "SELECT c.titulo as nombre,
                    CASE 
                        WHEN ac.estado = 'completado' THEN 100 
@@ -141,7 +140,7 @@ public function getCursosConProgreso() {
     }
 }
 
-// Método adicional para obtener información completa del alumno
+
 public function getInfoComplementariaAlumno() {
     $sql = "SELECT 
                 a.nombre as alumno_nombre,
@@ -164,7 +163,7 @@ public function getInfoComplementariaAlumno() {
     }
 }
 
-// Método para obtener cursos por categoría
+
 public function getCursosPorCategoria() {
     $sql = "SELECT 
                 cat.nombre as categoria,
@@ -187,7 +186,7 @@ public function getCursosPorCategoria() {
     }
 }
 
-// Método para obtener las clases del alumno
+
 public function getClasesAlumno() {
     $sql = "SELECT 
                 cl.nombre as clase_nombre,
